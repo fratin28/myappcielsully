@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATAK ARCADE PRO</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            background-color: #0d0d1a;
+            color: #e0e0e0;
+            font-family: 'Press Start 2P', cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+            perspective: 1000px;
+        }
+
+        /* Effet Scanlines pour un look CRT rétro */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.3) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .game-container {
+            position: relative;
+            width: 650px;
+            height: 420px;
+            background: #1a1a2e;
+            border-radius: 25px;
+            border: 4px solid #0f0f18;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transform: rotateX(15deg) rotateZ(-1deg); /* Ajout de la perspective */
+            transition: transform 0.2s ease;
+        }
+
+        .game-container:hover {
+            transform: rotateX(10deg) rotateZ(0deg);
+        }
+
+        .rgb-border {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 5px solid transparent;
+            border-radius: 30px;
+            animation: rgb-glow 4s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rgb-glow {
+            0% { border-color: #ff00de; box-shadow: 0 0 20px #ff00de; }
+            25% { border-color: #00f7ff; box-shadow: 0 0 20px #00f7ff; }
+            50% { border-color: #00ff41; box-shadow: 0 0 20px #00ff41; }
+            75% { border-color: #fff600; box-shadow: 0 0 20px #fff600; }
+            100% { border-color: #ff00de; box-shadow: 0 0 20px #ff00de; }
+        }
+
+        .score-display-container {
+            background-color: #080808;
+            border: 3px solid #333;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: inset 0 0 10px #000;
+        }
+
+        #score-display {
+            font-size: 1.8em;
+            color: #00ff41;
+            text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 15px #0f0, 0 0 20px #0f0;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .game-area {
+            position: relative;
+            width: 400px;
+            height: 220px;
+        }
+
+        .game-button {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #333;
+            background-color: #2a2a3a;
+            transition: all 0.1s ease;
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.7), 0 2px 3px rgba(0,0,0,0.5);
+        }
+        
+        .game-button:active {
+            transform: scale(0.95);
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.8);
+        }
+
+        #btn-1 { top: 0; left: 0; }
+        #btn-2 { top: 0; right: 0; }
+        #btn-3 { bottom: 0; left: 0; }
+        #btn-4 { bottom: 0; right: 0; }
+
+        #start-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            font-size: 26px;
+            background-color: #111;
+            color: #fff;
+            border: 5px solid #ff4500;
+            cursor: pointer;
+            text-shadow: 0 0 8px #fff;
+            transition: all 0.2s ease;
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 20px #ff4500, inset 0 0 15px rgba(255, 69, 0, 0.5); }
+            50% { box-shadow: 0 0 35px #ff8c00, inset 0 0 20px rgba(255, 140, 0, 0.7); }
+            100% { box-shadow: 0 0 20px #ff4500, inset 0 0 15px rgba(255, 69, 0, 0.5); }
+        }
+
+        #start-button:hover:not(:disabled) {
+            background-color: #ff4500;
+            color: #000;
+            animation-play-state: paused; /* Arrête le pulse au survol */
+        }
+        
+        #start-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            animation: none;
+        }
+
+        .light-on-1 { background-color: #00f7ff; box-shadow: 0 0 30px #00f7ff, inset 0 0 10px rgba(255,255,255,0.5), 0 2px 3px rgba(0,0,0,0.5); border-color: #92faff; }
+        .light-on-2 { background-color: #00ff41; box-shadow: 0 0 30px #00ff41, inset 0 0 10px rgba(255,255,255,0.5), 0 2px 3px rgba(0,0,0,0.5); border-color: #9affb2; }
+        .light-on-3 { background-color: #ff00de; box-shadow: 0 0 30px #ff00de, inset 0 0 10px rgba(255,255,255,0.5), 0 2px 3px rgba(0,0,0,0.5); border-color: #ff94f3; }
+        .light-on-4 { background-color: #fff600; box-shadow: 0 0 30px #fff600, inset 0 0 10px rgba(255,255,255,0.5), 0 2px 3px rgba(0,0,0,0.5); border-color: #fffb92; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="rgb-border"></div>
+        <div class="score-display-container">
+            <div id="score-display">BATAK PRO</div>
+        </div>
+
+        <div class="game-area">
+            <button id="start-button">START</button>
+            <div class="game-button" id="btn-1"></div>
+            <div class="game-button" id="btn-2"></div>
+            <div class="game-button" id="btn-3"></div>
+            <div class="game-button" id="btn-4"></div>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop><source src="https://www.soundimage.org/wp-content/uploads/2016/06/8-Bit-Puzzler.mp3" type="audio/mpeg"></audio>
+    <audio id="start-sound"><source src="https://cdn.freesound.org/previews/219/219244_4012693-lq.mp3" type="audio/mpeg"></audio>
+    <audio id="button-sound"><source src="https://cdn.freesound.org/previews/469/469357_6194983-lq.mp3" type="audio/mpeg"></audio>
+    <audio id="end-sound"><source src="https://cdn.freesound.org/previews/270/270319_5123851-lq.mp3" type="audio/mpeg"></audio>
+
+    <script>
+        const startButton = document.getElementById('start-button');
+        const scoreDisplay = document.getElementById('score-display');
+        const gameButtons = Array.from(document.querySelectorAll('.game-button'));
+        
+        // --- Éléments Audio ---
+        const bgMusic = document.getElementById('bg-music');
+        const startSound = document.getElementById('start-sound');
+        const buttonSound = document.getElementById('button-sound');
+        const endSound = document.getElementById('end-sound');
+        bgMusic.volume = 0.3; // Réglage du volume de la musique de fond
+
+        // --- Variables du jeu ---
+        const TOTAL_PRESSES = 15;
+        let pressCount = 0;
+        let startTime;
+        let gameActive = false;
+        let currentActiveButton = null;
+
+        // --- Écouteur d'événement principal ---
+        startButton.addEventListener('click', startGame);
+
+        gameButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // On vérifie si le jeu est actif et si on clique sur le bon bouton
+                if (gameActive && button === currentActiveButton) {
+                    handleCorrectPress();
+                }
+            });
+        });
+
+        function startGame() {
+            startButton.disabled = true;
+            startSound.play();
+            
+            // --- Démarrage de la musique de fond ---
+            bgMusic.currentTime = 0;
+            bgMusic.play();
+            
+            pressCount = 0;
+            gameActive = true;
+            scoreDisplay.textContent = `${pressCount} / ${TOTAL_PRESSES}`;
+            
+            // Laisse le temps au son de démarrer avant que le jeu ne commence
+            setTimeout(() => {
+                startTime = Date.now();
+                activateRandomButton();
+            }, 1000);
+        }
+
+        function activateRandomButton() {
+            // Si le nombre de pressions est atteint, on termine le jeu
+            if (pressCount >= TOTAL_PRESSES) {
+                endGame();
+                return;
+            }
+
+            // Sélectionne un bouton au hasard parmi les 4
+            const randomIndex = Math.floor(Math.random() * gameButtons.length);
+            currentActiveButton = gameButtons[randomIndex];
+            
+            // Ajoute la classe CSS pour l'allumer avec la bonne couleur
+            const colorClass = `light-on-${currentActiveButton.id.split('-')[1]}`;
+            currentActiveButton.classList.add(colorClass);
+        }
+        
+        function handleCorrectPress() {
+            pressCount++;
+            scoreDisplay.textContent = `${pressCount} / ${TOTAL_PRESSES}`;
+            
+            buttonSound.currentTime = 0;
+            buttonSound.play();
+
+            // Éteint le bouton actuel en retirant sa classe de couleur
+            const colorClass = `light-on-${currentActiveButton.id.split('-')[1]}`;
+            currentActiveButton.classList.remove(colorClass);
+            currentActiveButton = null;
+
+            // Allume le prochain bouton après un court délai pour fluidifier le jeu
+            setTimeout(activateRandomButton, 150);
+        }
+
+        function endGame() {
+            gameActive = false;
+            
+            // --- Arrêt de la musique de fond ---
+            bgMusic.pause();
+            endSound.play();
+            
+            const endTime = Date.now();
+            const totalTime = ((endTime - startTime) / 1000).toFixed(2);
+            scoreDisplay.textContent = `TIME: ${totalTime}s`;
+            
+            // Réactive le bouton START pour pouvoir rejouer
+            startButton.disabled = false;
+            startButton.textContent = "REPLAY";
+        }
+
+    </script>
+</body>
+</html>

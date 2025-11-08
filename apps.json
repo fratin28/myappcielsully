@@ -34,6 +34,13 @@
       "description": "Aides de code, visualiseurs d'algorithmes et outils pour les développeurs.",
       "lien": "programmation.html",
       "icone": "https://img.icons8.com/fluency/96/code.png"
+    },
+	{
+      "id": "bonus",
+      "titre": "Bonus",
+      "description": "Une page bonus pour se détendre !",
+      "lien": "bonus.html",
+      "icone": "https://img.icons8.com/fluency/96/arcade-cabinet.png"
     }
   ],
   "applications": [
