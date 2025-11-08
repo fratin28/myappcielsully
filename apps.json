@@ -1,0 +1,95 @@
+{
+  "categories": [
+    {
+      "id": "electronique",
+      "titre": "Électronique",
+      "description": "Applications et simulateurs pour les circuits électroniques.",
+      "lien": "electronique.html",
+      "icone": "https://img.icons8.com/fluency/96/processor.png"
+    },
+    {
+      "id": "systeme",
+      "titre": "Systèmes",
+      "description": "Outils pour l'administration et la compréhension des systèmes d'exploitation.",
+      "lien": "systeme.html",
+      "icone": "https://img.icons8.com/fluency/96/system-task.png"
+    },
+    {
+      "id": "reseau",
+      "titre": "Réseaux",
+      "description": "Utilitaires pour le calcul, l'analyse et la visualisation réseau.",
+      "lien": "reseau.html",
+      "icone": "https://img.icons8.com/fluency/96/network-card.png"
+    },
+    {
+      "id": "cyber",
+      "titre": "Cybersécurité",
+      "description": "Démonstrations et outils liés aux concepts de la cybersécurité.",
+      "lien": "cyber.html",
+      "icone": "https://img.icons8.com/fluency/96/privacy.png"
+    },
+    {
+      "id": "programmation",
+      "titre": "Programmation",
+      "description": "Aides de code, visualiseurs d'algorithmes et outils pour les développeurs.",
+      "lien": "programmation.html",
+      "icone": "https://img.icons8.com/fluency/96/code.png"
+    }
+  ],
+  "applications": [
+  	{
+      "categorie": "electronique",
+      "titre": "Simulateur du déplacement des électrons dans un fil",
+      "description": "Apréhender la loi d'Ohm en manipulant la tension et la résistance.",
+      "lien": "electronique/URI.html"
+    },
+    {
+      "categorie": "electronique",
+      "titre": "Calculateur de Loi d'Ohm",
+      "description": "Une application simple pour calculer la tension, le courant ou la résistance.",
+      "lien": "electronique/calculateur-ohm.html"
+    },
+    {
+      "categorie": "electronique",
+      "titre": "Code des couleurs des résistances",
+      "description": "Trouver la valeur d'une résistance à partir de ses anneaux de couleur.",
+      "lien": "electronique/code-couleurs-resistances.html"
+    },
+    {
+      "categorie": "reseau",
+      "titre": "Calculateur de Sous-réseaux",
+      "description": "Calculez rapidement les masques, adresses de réseau et de broadcast.",
+      "lien": "reseau/calculateur-subnets.html"
+    },
+    {
+      "categorie": "systeme",
+      "titre": "Visualiseur de commandes Cron",
+      "description": "Un outil pour comprendre la syntaxe des tâches planifiées sous Linux.",
+      "lien": "systeme/visualiseur-cron.html"
+    },
+    {
+      "categorie": "cyber",
+      "titre": "Générateur de mot de passe",
+      "description": "Créez des mots de passe robustes et sécurisés en un clic.",
+      "lien": "cyber/generateur-mdp.html"
+    },
+    {
+      "categorie": "programmation",
+      "titre": "Visualiseur de Flexbox CSS",
+      "description": "Un outil interactif pour comprendre le fonctionnement de Flexbox en CSS.",
+      "lien": "programmation/visualiseur-flexbox.html"
+    },
+    {
+      "categorie": "programmation",
+      "titre": "Encodeur/Décodeur Base64",
+      "description": "Convertissez du texte en Base64 et vice-versa.",
+      "lien": "programmation/encodeur-base64.html"
+    },
+    {
+      "categorie": "programmation",
+      "titre": "Leçon Interactive : Le 'if' Arduino",
+      "description": "Apprenez à utiliser l'instruction conditionnelle 'if' avec une démo et des exercices.",
+      "lien": "programmation/if-arduino.html"
+    }
+  ]
+}

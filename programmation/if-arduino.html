@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprendre l'Instruction 'if' Arduino</title>
+    <!-- Chargement de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Police Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gris clair */
+        }
+        /* Style pour les blocs de code */
+        pre {
+            background-color: #1E293B; /* Bleu-gris foncé */
+            color: #E2E8F0; /* Gris clair */
+            padding: 1rem;
+            border-radius: 0.5rem; /* Coins arrondis */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        /* Thème Sarcelle (Teal) */
+        .tab-button.active {
+            background-color: #14B8A6; /* Teal */
+            color: white;
+            border-bottom-width: 4px;
+            border-bottom-color: #0D9488; /* Teal plus foncé */
+        }
+        .tab-button:not(.active):hover {
+            background-color: #e5e7eb; /* Gris léger au survol */
+        }
+        .quiz-option {
+            transition: background-color 0.3s ease;
+        }
+        .quiz-option:not(:disabled):hover {
+            background-color: #ccfbf1; /* Teal très clair */
+        }
+        .quiz-option:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        /* Style pour les conteneurs d'exercices */
+        .exercise-section {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #d1d5db; /* border-gray-300 */
+        }
+        .exercise-section:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        /* Style pour le log interactif */
+        #if-log {
+            background-color: #0F172A; /* Bleu nuit */
+            color: #94A3B8; /* Gris-bleu */
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            height: 250px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+        }
+        #if-log p {
+            margin: 0;
+            padding: 2px 0;
+        }
+        #if-log p.success {
+            color: #22C55E; /* Vert */
+        }
+        #if-log p.fail {
+            color: #F87171; /* Rouge */
+        }
+        #if-log p.info {
+            color: #38BDF8; /* Bleu clair */
+        }
+        #if-log p.result {
+            color: #FDE047; /* Jaune */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
+        
+        <!-- En-tête -->
+        <header class="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-6">
+            <h1 class="text-3xl font-bold">Comprendre l'Instruction <code>if</code> Arduino</h1>
+            <p class="mt-2 text-lg opacity-90">Prendre des décisions dans votre code.</p>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="p-6 md:p-8">
+
+            <!-- Section : Tabs interactives -->
+            <div>
+                <!-- Boutons des onglets -->
+                <div class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button active py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'definition')">1. Définition & Syntaxe</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'pieges')">3. Pièges & Erreurs</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'exercices')">4. Exercices</button>
+                </div>
+
+                <!-- Contenu des onglets -->
+                <div id="tab-content">
+                    
+                    <!-- Onglet 1: Définition & Syntaxe -->
+                    <div id="definition" class="tab-panel">
+                        <h3 class="text-xl font-semibold mb-4 text-teal-600">Qu'est-ce qu'une Instruction <code>if</code> ?</h3>
+                        <p class="mb-4">L'instruction <code>if</code> ("Si") est la structure de contrôle la plus importante. Elle permet à votre programme de <strong class="font-semibold">prendre une décision</strong>.</p>
+                        <p>Elle exécute un bloc de code <strong class="font-semibold">uniquement si une condition est vraie</strong>. Si la condition est fausse, le bloc est ignoré.</p>
+
+                        <h4 class="font-semibold mt-6 mb-2">Syntaxe 1 : <code>if</code> (simple)</h4>
+                        <p>Le cas le plus basique : "Si cela est vrai, fais ceci."</p>
+                        <pre><code>int temperature = 25;
+
+if (temperature > 20) {
+  // Ce code s'exécute, car 25 > 20 est VRAI
+  Serial.println("Il fait chaud !");
+}</code></pre>
+
+                        <h4 class="font-semibold mt-6 mb-2">Syntaxe 2 : <code>if...else</code> (Si... Sinon)</h4>
+                        <p>Permet de choisir entre deux blocs : "Si cela est vrai, fais ceci. SINON, fais cela."</p>
+                        <pre><code>int age = 15;
+
+if (age >= 18) {
+  // Ce bloc est ignoré (15 >= 18 est FAUX)
+  Serial.println("Vous êtes majeur.");
+} else {
+  // Ce bloc s'exécute
+  Serial.println("Vous êtes mineur.");
+}</code></pre>
+                        
+                        <h4 class="font-semibold mt-6 mb-2">Syntaxe 3 : <code>if...else if...else</code> (La chaîne)</h4>
+                        <p>Permet de tester plusieurs conditions à la suite. Le programme s'arrête au <strong class="font-semibold">premier</strong> bloc vrai qu'il trouve.</p>
+                        <pre><code>int note = 12;
+
+if (note < 10) {
+  // Faux (12 < 10 est FAUX)
+  Serial.println("Insuffisant");
+} else if (note < 14) {
+  // Vrai (12 < 14 est VRAI)
+  // Ce bloc s'exécute
+  Serial.println("Mention passable");
+} else if (note < 18) {
+  // Ignoré (même si 12 < 18 est vrai, on s'est arrêté avant)
+  Serial.println("Mention bien");
+} else {
+  // Ignoré
+  Serial.println("Mention très bien");
+}</code></pre>
+                    </div>
+
+                    <!-- Onglet 2: Démo Interactive -->
+                    <div id="demo" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4">Testez la logique <code>if</code> !</h3>
+                        <p class="mb-4">Entrez une température et voyez quel bloc de code est exécuté.</p>
+                        
+                        <pre class="mb-4"><code>if (temp < 10) {
+  Serial.println("Il fait très froid.");
+} else if (temp < 20) {
+  Serial.println("Il fait frais.");
+} else {
+  Serial.println("Il fait bon ou chaud.");
+}</code></pre>
+
+                        <div class="flex items-center space-x-3 mb-4">
+                             <label for="temp-input" class="font-semibold">Température :</label>
+                             <input type="number" id="temp-input" class="w-20 p-2 border rounded-md" placeholder="ex: 15">
+                             <button id="demo-button" onclick="runIfDemo()" class="bg-teal-500 text-white px-6 py-2 rounded-md hover:bg-teal-600 font-semibold">
+                                Tester
+                             </button>
+                        </div>
+
+                        <h4 class="font-semibold mb-2">Log d'exécution :</h4>
+                        <div id="if-log">
+                            <p class="text-gray-500">Entrez une température et cliquez sur 'Tester'...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Onglet 3: Pièges & Erreurs -->
+                    <div id="pieges" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4 text-teal-600">Piège 1 : <code>=</code> (Assignation) vs <code>==</code> (Comparaison)</h3>
+                        <p class="mb-4">C'est l'erreur la plus difficile à trouver !</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><code>x == 5</code> : "Est-ce que x est ÉGAL à 5 ?" (Condition, ce qu'on veut)</li>
+                            <li><code>x = 5</code> : "Mets 5 DANS x" (Assignation, change la valeur)</li>
+                        </ul>
+                        
+                        <pre><code>int x = 10;
+// ERREUR ! Ceci ne teste pas, il ASSIGNE 5 à x.
+// L'assignation (5) est VRAIE (non-zéro).
+if (x = 5) { 
+  // Ce bloc s'exécute toujours, et x vaut 5 après !
+  Serial.println("Erreur !");
+}
+// Le bon code est : if (x == 5) { ... }</code></pre>
+
+                        <h3 class="text-xl font-semibold mb-4 mt-8 text-teal-600">Piège 2 : Le point-virgule parasite</h3>
+                        <p class="mb-4">Un point-virgule (<code>;</code>) termine une instruction. Si vous en mettez un après le <code>if</code>, vous créez un bloc... vide !</p>
+                        <pre><code>// ERREUR : Le ; termine le if
+if (temperature < 10); 
+{
+  // Ce bloc n'est plus lié au 'if'.
+  // Il s'exécutera TOUJOURS !
+  Serial.println("Toujours affiché");
+}</code></pre>
+
+                        <h3 class="text-xl font-semibold mb-4 mt-8 text-teal-600">Piège 3 : Oublier les accolades <code>{ }</code></h3>
+                        <p class="mb-4">Si vous n'utilisez pas d'accolades, le <code>if</code> ne contrôle que la <strong class="font-semibold">toute première ligne</strong> qui le suit.</p>
+                        <pre><code>int x = 10;
+if (x > 5)
+  Serial.println("Ligne 1"); // Contrôlée par le if
+  Serial.println("Ligne 2"); // PAS contrôlée ! S'exécute toujours.
+
+// Si x valait 0, le code afficherait "Ligne 2",
+// ce qui est une erreur de logique.
+// Mettez toujours des accolades !</code></pre>
+                    </div>
+
+                    <!-- Onglet 4: Exercices -->
+                    <div id="exercices" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4">Testez vos connaissances !</h3>
+                        
+                        <!-- Exercice 1 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-teal-600 mb-4">Exercice 1 : Prédiction simple</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Qu'affichera ce code ?</p>
+                                <pre class="mb-4"><code>int x = 5;
+if (x > 10) {
+  Serial.println("A");
+} else {
+  Serial.println("B");
+}</code></pre>
+                                <div id="quiz-options-1" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 'A')">A) "A"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 'B')">B) "B"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 'C')">C) "A" et "B"</button>
+                                </div>
+                                <div id="quiz-feedback-1" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 2 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-teal-600 mb-4">Exercice 2 : Le piège <code>=</code> vs <code>==</code></h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Qu'affichera ce code ? (Attention au piège !)</p>
+                                <pre class="mb-4"><code>int x = 0;
+if (x = 10) { // Notez le '=' simple
+  Serial.println("Vrai");
+} else {
+  Serial.println("Faux");
+}</code></pre>
+                                <div id="quiz-options-2" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 'A')">A) "Vrai"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 'B')">B) "Faux"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 'C')">C) Rien, erreur de compilation</button>
+                                </div>
+                                <div id="quiz-feedback-2" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 3 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-teal-600 mb-4">Exercice 3 : La chaîne <code>else if</code></h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Qu'affichera ce code ?</p>
+                                <pre class="mb-4"><code>int val = 5;
+if (val < 5) {
+  Serial.println("A");
+} else if (val < 10) {
+  Serial.println("B");
+} else {
+  Serial.println("C");
+}</code></pre>
+                                <div id="quiz-options-3" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 'A')">A) "A"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 'B')">B) "B"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 'C')">C) "C"</button>
+                                </div>
+                                <div id="quiz-feedback-3" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 4 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-teal-600 mb-4">Exercice 4 : La chaîne <code>else if</code> (Partie 2)</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Qu'affichera ce code ? (Attention)</p>
+                                <pre class="mb-4"><code>int val = 20;
+if (val > 5) {
+  Serial.println("A");
+} else if (val > 10) {
+  Serial.println("B");
+} else {
+  Serial.println("C");
+}</code></pre>
+                                <div id="quiz-options-4" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'A')">A) "A"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'B')">B) "B"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'C')">C) "A" et "B"</button>
+                                </div>
+                                <div id="quiz-feedback-4" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+                        
+                        <!-- Exercice 5 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-teal-600 mb-4">Exercice 5 : Le point-virgule parasite</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Qu'affichera ce code ?</pre>
+                                <pre class="mb-4"><code>if (10 > 5); // <-- Notez le ;
+{
+  Serial.println("Test");
+}</code></pre>
+                                <div id="quiz-options-5" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'A')">A) "Test"</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'B')">B) Rien du tout</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'C')">C) Une erreur de compilation</button>
+                                </div>
+                                <div id="quiz-feedback-5" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script>
+        // Logique des onglets
+        function openTab(event, tabName) {
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            tabPanels.forEach(panel => panel.style.display = 'none');
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active', 'text-gray-700'));
+
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        // Logique de la Démo Interactive
+        const logEl = document.getElementById('if-log');
+        const inputEl = document.getElementById('temp-input');
+
+        function logMessage(message, type = '') {
+            logEl.innerHTML += `<p class="${type}">${message}</p>`;
+            logEl.scrollTop = logEl.scrollHeight; // Auto-scroll
+        }
+        
+        // Helper function for delay
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        async function runIfDemo() {
+            logEl.innerHTML = ''; // Nettoyer le log
+            const temp = parseInt(inputEl.value);
+
+            if (isNaN(temp)) {
+                logMessage("Erreur : Veuillez entrer un nombre.", 'fail');
+                return;
+            }
+            
+            logMessage(`Simulation démarrée. temp = ${temp}`, 'info');
+            await delay(500);
+
+            logMessage(`Test 1 : (temp < 10) ? (${temp} < 10)`);
+            await delay(800);
+            
+            if (temp < 10) {
+                logMessage(`   -> Condition VRAIE.`, 'success');
+                await delay(500);
+                logMessage(`   -> Exécution bloc 'if' :`);
+                logMessage(`   -> Résultat : "Il fait très froid."`, 'result');
+            } else {
+                logMessage(`   -> Condition FAUSSE.`, 'fail');
+                await delay(800);
+                
+                logMessage(`Test 2 : (temp < 20) ? (${temp} < 20)`);
+                await delay(800);
+                
+                if (temp < 20) {
+                    logMessage(`   -> Condition VRAIE.`, 'success');
+                    await delay(500);
+                    logMessage(`   -> Exécution bloc 'else if' :`);
+                    logMessage(`   -> Résultat : "Il fait frais."`, 'result');
+                } else {
+                    logMessage(`   -> Condition FAUSSE.`, 'fail');
+                    await delay(800);
+                    logMessage(`   -> Exécution bloc 'else' :`);
+                    logMessage(`   -> Résultat : "Il fait bon ou chaud."`, 'result');
+                }
+            }
+            
+            logMessage(`Fin de la simulation.`, 'info');
+        }
+
+
+        // --- Logique des Exercices ---
+        const correctAnswers = {
+            1: { val: 'B', correct: 'Correct ! La condition (5 > 10) est fausse, donc le bloc "else" s\'exécute.', wrong: 'Incorrect. La condition (5 > 10) est fausse.' },
+            2: { val: 'A', correct: 'Correct ! C\'est le piège. "x = 10" assigne 10 à x. La valeur de cette assignation (10) est non-nulle, donc VRAIE.', wrong: 'Incorrect. C\'est le piège ! (x = 10) est une assignation, pas une comparaison. La valeur (10) est VRAIE.' },
+            3: { val: 'B', correct: 'Correct ! (val < 5) est faux. (val < 10) est vrai. Le code affiche "B".', wrong: 'Incorrect. (5 < 5) est faux. Le code passe au "else if". (5 < 10) est vrai.' },
+            4: { val: 'A', correct: 'Correct ! La première condition (20 > 5) est VRAIE. Le code affiche "A" et s\'arrête. Il n\'évalue pas le "else if".', wrong: 'Incorrect. La chaîne s\'arrête au premier "vrai" qu\'elle trouve. (20 > 5) est vrai.' },
+            5: { val: 'A', correct: 'Correct ! Le point-virgule crée un "if" vide. Le bloc { Serial.println("Test"); } n\'est pas conditionnel, il s\'exécute toujours.', wrong: 'Incorrect. Le ; termine le "if". Le bloc { ... } est un bloc de code normal qui s\'exécute juste après.' }
+        };
+
+        function checkQuiz(quizNumber, selectedAnswer) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${quizNumber}`);
+            const optionsEl = document.getElementById(`quiz-options-${quizNumber}`);
+            
+            optionsEl.querySelectorAll('button').forEach(button => button.disabled = true);
+
+            const quizData = correctAnswers[quizNumber];
+            if (selectedAnswer === quizData.val) {
+                feedbackEl.textContent = quizData.correct;
+                feedbackEl.style.color = 'green';
+            } else {
+                feedbackEl.textContent = quizData.wrong;
+                feedbackEl.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>

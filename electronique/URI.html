@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur : Loi d'Ohm & Puissance</title>
+    <!-- Chargement de Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chargement de la police Inter --><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Définition de la police Inter comme police par défaut */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style pour le canvas pour s'assurer qu'il s'affiche correctement */
+        canvas {
+            display: block;
+            width: 100%;
+            border-radius: 0.5rem; /* Coins arrondis */
+        }
+        /* Style pour les curseurs (sliders) */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background-color: #374151; /* bg-gray-700 */
+            border-radius: 4px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #f59e0b; /* bg-yellow-500 */
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background-color: #f59e0b; /* bg-yellow-500 */
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-4 md:p-8 flex items-center justify-center">
+
+    <div class="max-w-4xl w-full bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
+        
+        <!-- Titre --><h1 class="text-3xl font-bold text-center text-yellow-400">
+            Visualiseur : Loi d'Ohm & Puissance
+        </h1>
+        
+        <!-- Zone de Simulation --><div class="bg-gray-900 p-4 rounded-lg shadow-inner">
+            <canvas id="wire-canvas" height="150"></canvas>
+        </div>
+
+        <!-- Panneau de Contrôle --><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Contrôles des Sliders --><div class="bg-gray-700 p-5 rounded-lg space-y-6">
+                <!-- Contrôle de la Tension -->
+                <div>
+                    <label for="voltage-slider" class="font-semibold text-lg">
+                        Contrôler la Tension (Volts)
+                    </label>
+                    <div class="flex items-center space-x-4 mt-3">
+                        <input id="voltage-slider" type="range" min="0" max="48" value="12" step="1" class="w-full">
+                        <span id="voltage-value" class="text-xl font-bold text-purple-400 w-20 text-right">
+                            12 V
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Contrôle de la Résistance -->
+                <div>
+                    <label for="resistance-slider" class="font-semibold text-lg">
+                        Contrôler la Résistance (Ohms)
+                    </label>
+                    <div class="flex items-center space-x-4 mt-3">
+                        <input id="resistance-slider" type="range" min="1" max="100" value="10" step="1" class="w-full">
+                        <span id="resistance-value" class="text-xl font-bold text-red-400 w-20 text-right">
+                            10 Ω
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boutons Pause et Réinitialisation --><div class="bg-gray-700 p-5 rounded-lg grid grid-cols-2 gap-4 items-center justify-center">
+                <button id="pause-button" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg">
+                    Pause
+                </button>
+                <button id="reset-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg">
+                    Réinitialiser
+                </button>
+            </div>
+        </div>
+
+        <!-- Jauges de Visualisation --><div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <!-- Jauge 1: Tension --><div class="bg-gray-700 p-6 rounded-lg text-center shadow-lg">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Tension (Source)
+                </h2>
+                <div id="voltage-display" class="text-5xl font-extrabold text-purple-400">
+                    12 V
+                </div>
+            </div>
+            
+            <!-- Jauge 2: Ampèremètre --><div class="bg-gray-700 p-6 rounded-lg text-center shadow-lg">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Courant (Actuel)
+                </h2>
+                <div id="current-display" class="text-5xl font-extrabold text-yellow-400">
+                    1.2 A
+                </div>
+            </div>
+
+            <!-- Jauge 3: Puissance (NOUVEAU) --><div class="bg-gray-700 p-6 rounded-lg text-center shadow-lg">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Puissance (Watts)
+                </h2>
+                <div id="power-display" class="text-5xl font-extrabold text-orange-400">
+                    0.0 W
+                </div>
+            </div>
+
+            <!-- Jauge 4: Compteur de Coulombs --><div class="bg-gray-700 p-6 rounded-lg text-center shadow-lg">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Charge Passée
+                </h2>
+                <div id="coulomb-display" class="text-5xl font-extrabold text-blue-400">
+                    0.0 C
+                </div>
+            </div>
+            
+            <!-- Jauge 5: Énergie (NOUVEAU) --><div class="bg-gray-700 p-6 rounded-lg text-center shadow-lg">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Énergie Dépensée
+                </h2>
+                <div id="energy-display" class="text-5xl font-extrabold text-red-400">
+                    0.0 J
+                </div>
+            </div>
+
+            <!-- Jauge 6: Compteur de Temps --><div class="bg-gray-700 p-6 rounded-lg text-center shadow-lg">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Temps Écoulé
+                </h2>
+                <div id="time-display" class="text-5xl font-extrabold text-green-400">
+                    0.0 s
+                </div>
+            </div>
+        </div>
+        
+        <!-- Explication --><div class="text-center bg-gray-700 p-4 rounded-lg space-y-2">
+            <p class="text-lg text-gray-300">
+                <span class="font-bold text-yellow-400">Courant (A)</span> = <span class="font-bold text-purple-400">Tension (V)</span> / <span class="font-bold text-red-400">Résistance (Ω)</span>
+            </p>
+            <p class="text-lg text-gray-300">
+                <span class="font-bold text-orange-400">Puissance (W)</span> = <span class="font-bold text-purple-400">Tension (V)</span> * <span class="font-bold text-yellow-400">Courant (A)</span>
+            </p>
+            <p class="text-md text-gray-400 mt-1">
+                <span class="font-bold text-blue-400">Charge (C)</span> = <span class="font-bold text-yellow-400">Courant (A)</span> * <span class="font-bold text-green-400">Temps (s)</span>
+            </p>
+            <p class="text-md text-gray-400 mt-1">
+                <span class="font-bold text-red-400">Énergie (J)</span> = <span class="font-bold text-orange-400">Puissance (W)</span> * <span class="font-bold text-green-400">Temps (s)</span>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // Éléments du DOM
+            const canvas = document.getElementById('wire-canvas');
+            const ctx = canvas.getContext('2d');
+            const resistanceSlider = document.getElementById('resistance-slider');
+            const resistanceValueDisplay = document.getElementById('resistance-value');
+            const voltageSlider = document.getElementById('voltage-slider');
+            const voltageValueDisplay = document.getElementById('voltage-value');
+            const currentDisplay = document.getElementById('current-display');
+            const coulombDisplay = document.getElementById('coulomb-display');
+            const pauseButton = document.getElementById('pause-button'); 
+            const resetButton = document.getElementById('reset-button');
+            const timeDisplay = document.getElementById('time-display');
+            const voltageDisplay = document.getElementById('voltage-display');
+            const powerDisplay = document.getElementById('power-display'); // NOUVEAU
+            const energyDisplay = document.getElementById('energy-display'); // NOUVEAU
+
+            // Paramètres de simulation
+            let currentVoltage = parseFloat(voltageSlider.value); 
+            let currentResistance = parseFloat(resistanceSlider.value); 
+            let targetAmperes = 0; 
+            let currentPower = 0; // NOUVEAU
+
+            let totalCoulombs = 0;
+            let totalTime = 0;
+            let totalEnergy = 0; // NOUVEAU
+            let lastTimestamp = 0;
+            let isPaused = false; 
+            
+            let totalDisplacement = 0; 
+
+            const particles = [];
+            const particleCount = 200; 
+            const wireHeight = 80; 
+
+            // Initialiser le canvas
+            function setupCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = 150; 
+            }
+
+            // Initialiser les particules pour un flux ordonné
+            function initParticles() {
+                particles.length = 0; 
+                const wireY = (canvas.height - wireHeight) / 2;
+                const startX = 45; // Commencer après la batterie
+
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        // MODIFIÉ 2: Utiliser la position de base pour x
+                        baseX: startX + Math.random() * (canvas.width - startX), // Position de base aléatoire
+                        x: 0, // x sera calculé
+                        y: wireY + wireHeight / 2 + (Math.random() - 0.5) * (wireHeight / 1.5), // Position y aléatoire dans le fil
+                        radius: 1.5, 
+                        color: 'rgba(255, 255, 255, 0.9)' 
+                    });
+                }
+                totalDisplacement = 0;
+                updateParticles(); // Appel initial pour définir les positions x
+            }
+
+            // --- Fonctions de Dessin ---
+
+            // NOUVEAU: Dessiner la source de tension (batterie)
+            function drawBattery() {
+                const x = 15;
+                const y = (canvas.height - wireHeight) / 2;
+                const batteryWidth = 30;
+                const batteryHeight = wireHeight;
+                const capHeight = 10;
+                const capWidth = 15;
+
+                // Corps de la batterie
+                ctx.fillStyle = '#4B5563'; // gray-600
+                ctx.fillRect(x, y, batteryWidth, batteryHeight);
+                
+                // Borne +
+                ctx.fillStyle = '#6B7280'; // gray-500
+                ctx.fillRect(x + (batteryWidth - capWidth) / 2, y - capHeight, capWidth, capHeight);
+
+                // Symbole +
+                ctx.fillStyle = '#E5E7EB'; // gray-200
+                ctx.font = 'bold 16px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('+', x + batteryWidth / 2, y + batteryHeight * 0.25);
+                
+                // Symbole -
+                ctx.font = 'bold 20px Inter';
+                ctx.fillText('−', x + batteryWidth / 2, y + batteryHeight * 0.75);
+            }
+
+            // Dessiner le fil électrique
+            function drawWire() {
+                const wireY = (canvas.height - wireHeight) / 2;
+                ctx.fillStyle = '#374151'; // bg-gray-700
+                // Fil principal (commence après la batterie)
+                const startX = 45; 
+                ctx.fillRect(startX, wireY, canvas.width - startX, wireHeight);
+                // Connexion borne -
+                ctx.fillRect(15, wireY + wireHeight - 5, 30, 5); 
+                // Connexion borne +
+                ctx.fillRect(15 + (30-15)/2, wireY - 10, 5, 10);
+                ctx.fillRect(15 + (30-15)/2, wireY, 22 - (15-15)/2, 5);
+            }
+
+            // NOUVEAU: Obtenir la couleur de chaleur en fonction de la puissance
+            function getHeatColor(power) {
+                // Puissance max visuelle (ajustez au besoin)
+                const maxVisualPower = 500; // 500W sera jaune vif
+                const heatRatio = Math.min(power / maxVisualPower, 1.0);
+
+                // Interpolation de couleur: Rouge (220, 38, 38) -> Orange -> Jaune vif (255, 255, 150)
+                const r = 220 + heatRatio * (255 - 220); // 220 -> 255
+                const g = 38 + heatRatio * (255 - 38);  // 38  -> 255
+                const b = 38 + heatRatio * (150 - 38);  // 38  -> 150
+
+                return `rgb(${r.toFixed(0)}, ${g.toFixed(0)}, ${b.toFixed(0)})`;
+            }
+
+            // Dessiner la résistance (bloc visuel) - MODIFIÉ
+            function drawResistor(power) {
+                const resistorWidth = 60;
+                const resistorHeight = wireHeight * 0.8;
+                const x = (canvas.width / 2) - (resistorWidth / 2);
+                const y = (canvas.height / 2) - (resistorHeight / 2);
+
+                const heatColor = getHeatColor(power); // Obtenir la couleur dynamique
+
+                ctx.strokeStyle = heatColor; // MODIFIÉ
+                ctx.lineWidth = 4;
+                ctx.strokeRect(x, y, resistorWidth, resistorHeight);
+
+                // Texte de la résistance
+                ctx.fillStyle = heatColor; // MODIFIÉ
+                ctx.font = 'bold 16px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(currentResistance.toFixed(0) + ' Ω', x + resistorWidth / 2, y - 15);
+            }
+
+
+            // Dessiner l'ampèremètre
+            function drawAmmeter() {
+                // Positionner l'ampèremètre avant la résistance
+                const x = (canvas.width / 2) - 100; // Avant la résistance
+                const wireY = (canvas.height - wireHeight) / 2;
+                
+                // Ligne de mesure
+                ctx.strokeStyle = '#f59e0b'; // text-yellow-500
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(x, wireY);
+                ctx.lineTo(x, wireY + wireHeight);
+                ctx.stroke();
+
+                // Cercle "A" de l'ampèremètre
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(x, canvas.height / 2, 15, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#111827'; // bg-gray-900 (pour le texte)
+                ctx.font = 'bold 18px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('A', x, canvas.height / 2 + 1);
+            }
+
+            // Dessiner les particules (électrons)
+            function drawParticles() {
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                });
+            }
+
+            // Mettre à jour la position des particules
+            // MODIFIÉ 3: Mettre à jour basé sur totalDisplacement
+            function updateParticles() {
+                const startX = 45;
+                const wireWidth = canvas.width - startX;
+
+                particles.forEach(p => {
+                    // Utiliser le modulo pour un enroulement fluide
+                    p.x = startX + ((p.baseX - startX + totalDisplacement) % wireWidth);
+                });
+            }
+
+            // --- Boucle Principale de Simulation ---
+
+            function simulationLoop(timestamp) {
+                // AJOUTÉ: Gestion de la pause
+                if (isPaused) {
+                    lastTimestamp = timestamp; // Réinitialiser le temps pour éviter un saut à la reprise
+                    requestAnimationFrame(simulationLoop);
+                    return; 
+                }
+
+                if (lastTimestamp === 0) {
+                    lastTimestamp = timestamp;
+                }
+
+                const deltaTime = (timestamp - lastTimestamp) / 1000;
+                lastTimestamp = timestamp;
+
+                // MODIFIÉ 4: Mettre à jour le déplacement total
+                const visualSpeedPerSecond = targetAmperes * 30; // Vitesse de base (pixels par seconde)
+                totalDisplacement += visualSpeedPerSecond * deltaTime;
+
+                // Mettre à jour les compteurs seulement si le courant est positif
+                if (targetAmperes > 0) {
+                    const chargePassedThisFrame = targetAmperes * deltaTime;
+                    totalCoulombs += chargePassedThisFrame;
+                    
+                    const energyThisFrame = currentPower * deltaTime; // NOUVEAU
+                    totalEnergy += energyThisFrame; // NOUVEAU
+
+                    totalTime += deltaTime;
+                }
+                
+                coulombDisplay.textContent = totalCoulombs.toFixed(2) + ' C';
+                energyDisplay.textContent = totalEnergy.toFixed(1) + ' J'; // NOUVEAU
+                timeDisplay.textContent = totalTime.toFixed(1) + ' s';
+
+                // --- Mettre à jour la partie visuelle ---
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                drawBattery(); // NOUVEAU
+                drawWire();
+                drawResistor(currentPower); // MODIFIÉ
+                drawAmmeter();
+                
+                updateParticles(); // MODIFIÉ 5: Appeler updateParticles sans deltaTime
+                drawParticles();
+
+                requestAnimationFrame(simulationLoop);
+            }
+
+            // --- Écouteurs d'Événements ---
+
+            // Fonction centralisée pour mettre à jour les calculs et les affichages
+            function updateCalculation() {
+                currentVoltage = parseFloat(voltageSlider.value);
+                currentResistance = parseFloat(resistanceSlider.value);
+                
+                // Calcul direct, le min du slider est 1 donc pas de division par zéro
+                targetAmperes = currentVoltage / currentResistance; // Loi d'Ohm: I = V / R
+                currentPower = currentVoltage * targetAmperes; // NOUVEAU: P = V * I
+
+                // Mettre à jour les affichages
+                voltageValueDisplay.textContent = `${currentVoltage.toFixed(0)} V`;
+                voltageDisplay.textContent = `${currentVoltage.toFixed(0)} V`;
+                resistanceValueDisplay.textContent = `${currentResistance.toFixed(0)} Ω`;
+                currentDisplay.textContent = `${targetAmperes.toFixed(1)} A`;
+                powerDisplay.textContent = `${currentPower.toFixed(1)} W`; // NOUVEAU
+            }
+
+            // Mettre à jour quand le curseur de résistance bouge
+            resistanceSlider.addEventListener('input', updateCalculation);
+
+            // Mettre à jour quand le curseur de tension bouge
+            voltageSlider.addEventListener('input', updateCalculation);
+
+            // AJOUTÉ: Mettre en pause / reprendre
+            pauseButton.addEventListener('click', () => {
+                isPaused = !isPaused;
+                if (isPaused) {
+                    pauseButton.textContent = 'Reprendre';
+                    pauseButton.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                    pauseButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                } else {
+                    pauseButton.textContent = 'Pause';
+                    pauseButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    pauseButton.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                }
+            });
+
+            // Réinitialiser les compteurs
+            resetButton.addEventListener('click', () => {
+                totalCoulombs = 0;
+                totalTime = 0;
+                totalEnergy = 0; // NOUVEAU
+                coulombDisplay.textContent = '0.0 C';
+                energyDisplay.textContent = '0.0 J'; // NOUVEAU
+                timeDisplay.textContent = '0.0 s';
+                lastTimestamp = performance.now(); 
+                
+                totalDisplacement = 0;
+                updateParticles(); // Mettre à jour les positions visuelles pour refléter le reset
+
+                // AJOUTÉ: Assurer que la simulation n'est pas en pause après un reset
+                if (isPaused) {
+                    isPaused = false;
+                    pauseButton.textContent = 'Pause';
+                    pauseButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    pauseButton.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                }
+            });
+
+            // Gérer le redimensionnement de la fenêtre
+            window.addEventListener('resize', () => {
+                setupCanvas();
+                initParticles(); 
+                // MODIFIÉ: Mettre à jour les positions visuelles sans affecter le compteur
+                updateParticles();
+            });
+
+            // --- Démarrage ---
+            setupCanvas();
+            initParticles();
+            updateCalculation(); // Appel initial pour définir les valeurs de départ
+            requestAnimationFrame(simulationLoop);
+        });
+    </script>
+</body>
+</html>
