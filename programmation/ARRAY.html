@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprendre les Tableaux (Arrays) Arduino</title>
+    <!-- Chargement de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Police Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gris clair */
+        }
+        /* Style pour les blocs de code */
+        pre {
+            background-color: #1E293B; /* Bleu-gris foncé */
+            color: #E2E8F0; /* Gris clair */
+            padding: 1rem;
+            border-radius: 0.5rem; /* Coins arrondis */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #10B981; /* Vert */
+            color: white;
+            border-bottom-width: 4px;
+            border-bottom-color: #059669; /* Vert plus foncé */
+        }
+        .tab-button:not(.active):hover {
+            background-color: #e5e7eb; /* Gris léger au survol */
+        }
+        .quiz-option {
+            transition: background-color 0.3s ease;
+        }
+        .quiz-option:not(:disabled):hover {
+            background-color: #d1fae5; /* Vert très clair */
+        }
+        .quiz-option:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        /* Style pour les conteneurs d'exercices */
+        .exercise-section {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #d1d5db; /* border-gray-300 */
+        }
+        .exercise-section:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        /* Style pour le log interactif */
+        #array-log {
+            background-color: #0F172A; /* Bleu nuit */
+            color: #94A3B8; /* Gris-bleu */
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+        }
+        #array-log p {
+            margin: 0;
+            padding: 2px 0;
+        }
+        #array-log p.success {
+            color: #22C55E; /* Vert */
+        }
+        #array-log p.fail {
+            color: #F87171; /* Rouge */
+        }
+        #array-log p.info {
+            color: #38BDF8; /* Bleu clair */
+        }
+        #array-log p.result {
+            color: #FDE047; /* Jaune */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
+        
+        <!-- En-tête -->
+        <header class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6">
+            <h1 class="text-3xl font-bold">Comprendre les Tableaux (Arrays) Arduino</h1>
+            <p class="mt-2 text-lg opacity-90">Stocker et organiser des listes de données.</p>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="p-6 md:p-8">
+
+            <!-- Section : Tabs interactives -->
+            <div>
+                <!-- Boutons des onglets -->
+                <div class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button active py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'definition')">1. Définition & Syntaxe</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'pieges')">3. Pièges & Erreurs</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'exercices')">4. Exercices</button>
+                </div>
+
+                <!-- Contenu des onglets -->
+                <div id="tab-content">
+                    
+                    <!-- Onglet 1: Définition & Syntaxe -->
+                    <div id="definition" class="tab-panel">
+                        <h3 class="text-xl font-semibold mb-4 text-green-600">Qu'est-ce qu'un Tableau (Array) ?</h3>
+                        <p class="mb-4">Un tableau (array) est une <strong class="font-semibold">collection de variables</strong> du même type, stockées de manière consécutive en mémoire sous un seul nom.</p>
+                        <p>Imaginez une commode (le tableau) avec plusieurs tiroirs numérotés (les indices). Chaque tiroir contient un objet (la valeur).</p>
+
+                        <h4 class="font-semibold mt-6 mb-2">Déclaration et Initialisation</h4>
+                        <p>Pour créer un tableau de 5 entiers (<code>int</code>) appelé <code>mesNotes</code> :</p>
+                        <pre><code>// Déclare un tableau de 5 entiers et l'initialise
+int mesNotes[5] = {10, 15, 12, 18, 9};</code></pre>
+                        
+                        <p class="mt-4">On peut aussi déclarer un tableau et le remplir plus tard :</p>
+                        <pre><code>int capteurs[3]; // Crée 3 "tiroirs" vides (valeurs non définies)
+
+// ... plus tard dans le code ...
+capteurs[0] = 100;
+capteurs[1] = 150;
+capteurs[2] = 200;</code></pre>
+
+                        <h4 class="font-semibold mt-6 mb-2">Accès aux éléments : L'Indice "zéro"</h4>
+                        <p>C'est le point le plus important : l'informatique commence à compter à partir de <strong class="font-semibold">0</strong>.</p>
+                        <p>Dans un tableau de 5 éléments, les "tiroirs" (indices) sont numérotés de 0 à 4.</p>
+                        
+                        <ul class="list-disc list-inside ml-4 mt-2 space-y-1 bg-gray-50 p-4 rounded-md">
+                            <li><code>mesNotes[0]</code> vaut <code>10</code> (le 1er élément)</li>
+                            <li><code>mesNotes[1]</code> vaut <code>15</code> (le 2ème élément)</li>
+                            <li><code>mesNotes[2]</code> vaut <code>12</code> (le 3ème élément)</li>
+                            <li><code>mesNotes[3]</code> vaut <code>18</code> (le 4ème élément)</li>
+                            <li><code>mesNotes[4]</code> vaut <code>9</code> (le 5ème et DERNIER élément)</li>
+                        </ul>
+                        
+                        <h4 class="font-semibold mt-6 mb-2">Modification des éléments</h4>
+                        <p>On accède à un élément avec son indice entre crochets <code>[]</code> pour le lire ou le modifier.</p>
+                        <pre><code>// Lire la valeur de l'élément à l'indice 3 (le 4ème)
+int noteSpecifique = mesNotes[3]; // noteSpecifique vaut 18
+
+// Modifier la valeur de l'élément à l'indice 1
+mesNotes[1] = 16; // Le tableau devient {10, 16, 12, 18, 9}</code></pre>
+                    </div>
+
+                    <!-- Onglet 2: Démo Interactive -->
+                    <div id="demo" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4">Explorez le tableau !</h3>
+                        <p class="mb-4">Nous avons ce tableau : <code>int notes[4] = {8, 12, 7, 15};</code></p>
+                        <p class="mb-4">Entrez un indice (0, 1, 2, ou 3) pour voir la valeur. Essayez aussi d'entrer un indice qui n'existe pas (comme 4 ou -1).</p>
+                        
+                        <pre class="mb-4"><code>int notes[4] = {8, 12, 7, 15};
+// ...
+valeur = notes[ VOTRE_INDICE ];</code></pre>
+
+                        <div class="flex items-center space-x-3 mb-4">
+                             <label for="indice-input" class="font-semibold">Je veux voir <code>notes[</code></label>
+                             <input type="number" id="indice-input" class="w-20 p-2 border rounded-md" placeholder="ex: 0">
+                             <label for="indice-input" class="font-semibold"><code>]</code></label>
+                             <button id="demo-button" onclick="runArrayDemo()" class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 font-semibold">
+                                Lire
+                             </button>
+                        </div>
+
+                        <h4 class="font-semibold mb-2">Log d'exécution :</h4>
+                        <div id="array-log">
+                            <p class="text-gray-500">Entrez un indice et cliquez sur 'Lire'...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Onglet 3: Pièges & Erreurs -->
+                    <div id="pieges" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4 text-green-600">Piège 1 : L'erreur "Off-by-One" (Décalage de un)</h3>
+                        <p class="mb-4">C'est l'erreur la plus fréquente. Si un tableau a 5 éléments, ses indices valides sont <strong class="font-semibold">0, 1, 2, 3, et 4</strong>.</p>
+                        <p>Tenter d'accéder à l'indice <code>5</code> est une erreur de <strong class="font-semibold">dépassement de tableau</strong> (array out of bounds).</p>
+
+                        <pre><code>int mesNotes[5] = {10, 15, 12, 18, 9};
+
+// ERREUR : Le "5ème" élément est à l'indice 4
+// Tenter de lire mesNotes[5] est HORS LIMITES !
+int erreur = mesNotes[5];</code></pre>
+                        
+                        <div class="mt-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+                            <p class="font-bold">Conséquence sur un Arduino :</p>
+                            <p>Le C++ (langage d'Arduino) <strong class="font-semibold">ne vous prévient pas</strong> ! Il va lire une zone mémoire qui ne lui appartient pas. Au mieux, vous lisez une valeur "poubelle" (un nombre aléatoire). Au pire, vous <strong class="font-semibold">écrasez une autre variable</strong> ou faites planter votre programme de manière imprévisible.</p>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-4 mt-8 text-green-600">Piège 2 : Le bon outil (<code>for</code>)</h3>
+                        <p class="mb-4">Comment parcourir un tableau ? La boucle <code>for</code> est l'outil parfait, car elle est basée sur un compteur (<code>i</code>) qui peut servir d'indice.</p>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h5 class="font-semibold text-red-600">La "mauvaise" façon (manuelle)</h5>
+                                <pre><code>int pins[3] = {9, 10, 11};
+pinMode(pins[0], OUTPUT);
+pinMode(pins[1], OUTPUT);
+pinMode(pins[2], OUTPUT);</code></pre>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-green-600">La "bonne" façon (avec <code>for</code>)</h5>
+                                <pre><code>int pins[3] = {9, 10, 11};
+for (int i = 0; i < 3; i++) {
+  // i vaudra 0, puis 1, puis 2
+  pinMode(pins[i], OUTPUT);
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Onglet 4: Exercices -->
+                    <div id="exercices" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4">Testez vos connaissances !</h3>
+                        
+                        <!-- Exercice 1 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-green-600 mb-4">Exercice 1 : L'index "zéro"</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Quel code permet d'accéder au <strong class="font-semibold">premier</strong> élément du tableau ?</p>
+                                <pre class="mb-4"><code>int data[3] = {100, 200, 300};</code></pre>
+                                <div id="quiz-options-1" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 'A')">A) <code>data[1]</code></button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 'B')">B) <code>data[0]</code></button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 'C')">C) <code>data.first()</code></button>
+                                </div>
+                                <div id="quiz-feedback-1" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 2 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-green-600 mb-4">Exercice 2 : Le dernier élément</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Un tableau est déclaré <code>int monTab[20];</code>. Quel est l'indice du <strong class="font-semibold">dernier</strong> élément accessible ?</p>
+                                <div id="quiz-options-2" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 20)">A) 20</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 19)">B) 19</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 21)">C) 21</button>
+                                </div>
+                                <div id="quiz-feedback-2" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 3 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-green-600 mb-4">Exercice 3 : Lire une valeur</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Que vaut <code>valeur</code> après ce code ?</p>
+                                <pre class="mb-4"><code>int vals[4] = {50, 25, 100, 75};
+int valeur = vals[2];</code></pre>
+                                <div id="quiz-options-3" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 25)">A) 25</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 50)">B) 50</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 100)">C) 100</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 75)">D) 75</button>
+                                </div>
+                                <div id="quiz-feedback-3" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 4 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-green-600 mb-4">Exercice 4 : Modifier une valeur</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Que vaut <code>valeur</code> après ce code ?</p>
+                                <pre class="mb-4"><code>int nums[3] = {1, 2, 3};
+nums[1] = 10;
+int valeur = nums[1];</code></pre>
+                                <div id="quiz-options-4" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 2)">A) 2</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 1)">B) 1</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 10)">C) 10</button>
+                                </div>
+                                <div id="quiz-feedback-4" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 5 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-green-600 mb-4">Exercice 5 : L'erreur "Off-by-One"</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Ce code va-t-il fonctionner sans erreur ?</p>
+                                <pre class="mb-4"><code>int data[5] = {1, 2, 3, 4, 5};
+int val = data[5];</code></pre>
+                                <div id="quiz-options-5" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'A')">A) Oui, <code>val</code> vaudra 5.</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'B')">B) Non, c'est un dépassement. L'indice 5 n'existe pas.</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'C')">C) Oui, <code>val</code> vaudra 0.</button>
+                                </div>
+                                <div id="quiz-feedback-5" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script>
+        // Logique des onglets
+        function openTab(event, tabName) {
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            tabPanels.forEach(panel => panel.style.display = 'none');
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active', 'text-gray-700'));
+
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        // Logique de la Démo Interactive
+        const logEl = document.getElementById('array-log');
+        const inputEl = document.getElementById('indice-input');
+        const notes = [8, 12, 7, 15]; // Notre tableau de démo
+
+        function logMessage(message, type = '') {
+            logEl.innerHTML += `<p class="${type}">${message}</p>`;
+            logEl.scrollTop = logEl.scrollHeight; // Auto-scroll
+        }
+
+        function runArrayDemo() {
+            logEl.innerHTML = ''; // Nettoyer le log
+            const indice = parseInt(inputEl.value);
+
+            logMessage(`Simulation demandée pour : notes[${indice}]`, 'info');
+
+            if (isNaN(indice)) {
+                logMessage(`Erreur : Veuillez entrer un nombre.`, 'fail');
+                return;
+            }
+
+            // Vérifier si l'indice est valide
+            if (indice >= 0 && indice < notes.length) {
+                const valeur = notes[indice];
+                logMessage(`Accès à l'indice ${indice}...`, 'success');
+                logMessage(`La valeur est : ${valeur}`, 'result');
+            } else {
+                logMessage(`ERREUR : DÉPASSEMENT DE TABLEAU !`, 'fail');
+                logMessage(`L'indice ${indice} est hors des limites.`, 'fail');
+                logMessage(`Les indices valides sont de 0 à ${notes.length - 1}.`, 'info');
+            }
+        }
+
+
+        // --- Logique des Exercices ---
+        const correctAnswers = {
+            1: { val: 'B', correct: 'Correct ! Le premier élément est toujours à l\'indice 0.', wrong: 'Incorrect. En C++ (Arduino), on compte à partir de 0. Le premier est [0].' },
+            2: { val: 19, correct: 'Correct ! Pour un tableau de 20 éléments, les indices vont de 0 à 19.', wrong: 'Incorrect. Un tableau de taille 20 a des indices de 0 (le premier) à 19 (le dernier).' },
+            3: { val: 100, correct: 'Correct ! vals[0]=50, vals[1]=25, vals[2]=100.', wrong: 'Incorrect. N\'oubliez pas de compter à partir de 0 ! L\'indice 2 est le troisième élément.' },
+            4: { val: 10, correct: 'Correct ! Le tableau devient {1, 10, 3}. La valeur à l\'indice 1 est 10.', wrong: 'Incorrect. Le code modifie d\'abord la valeur à l\'indice 1 (qui était 2) pour 10.' },
+            5: { val: 'B', correct: 'Correct ! C\'est l\'erreur "off-by-one". Les indices valides sont 0, 1, 2, 3, 4. L\'indice 5 n\'existe pas.', wrong: 'Incorrect. Un tableau de taille 5 a des indices de 0 à 4. data[5] est hors limites.' }
+        };
+
+        function checkQuiz(quizNumber, selectedAnswer) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${quizNumber}`);
+            const optionsEl = document.getElementById(`quiz-options-${quizNumber}`);
+            
+            optionsEl.querySelectorAll('button').forEach(button => button.disabled = true);
+
+            const quizData = correctAnswers[quizNumber];
+            if (selectedAnswer === quizData.val) {
+                feedbackEl.textContent = quizData.correct;
+                feedbackEl.style.color = 'green';
+            } else {
+                feedbackEl.textContent = quizData.wrong;
+                feedbackEl.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>

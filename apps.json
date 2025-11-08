@@ -73,6 +73,18 @@
       "description": "Créez des mots de passe robustes et sécurisés en un clic.",
       "lien": "cyber/generateur-mdp.html"
     },
+	{
+      "categorie": "programmation",
+      "titre": "Leçon Interactive : Le 'if' Arduino",
+      "description": "Apprenez à utiliser l'instruction conditionnelle 'if' avec une démo et des exercices.",
+      "lien": "programmation/if-arduino.html"
+    },
+	{
+      "categorie": "programmation",
+      "titre": "Leçon Interactive : Le 'for' Arduino",
+      "description": "Apprenez à utiliser l'instruction conditionnelle 'for' avec une démo et des exercices.",
+      "lien": "programmation/FOR.html"
+    },
     {
       "categorie": "programmation",
       "titre": "Visualiseur de Flexbox CSS",
@@ -84,12 +96,6 @@
       "titre": "Encodeur/Décodeur Base64",
       "description": "Convertissez du texte en Base64 et vice-versa.",
       "lien": "programmation/encodeur-base64.html"
-    },
-    {
-      "categorie": "programmation",
-      "titre": "Leçon Interactive : Le 'if' Arduino",
-      "description": "Apprenez à utiliser l'instruction conditionnelle 'if' avec une démo et des exercices.",
-      "lien": "programmation/if-arduino.html"
     }
   ]
 }

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprendre la Boucle 'for' Arduino</title>
+    <!-- Chargement de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Police Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gris clair */
+        }
+        /* Style pour les blocs de code */
+        pre {
+            background-color: #1E293B; /* Bleu-gris foncé */
+            color: #E2E8F0; /* Gris clair */
+            padding: 1rem;
+            border-radius: 0.5rem; /* Coins arrondis */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #3B82F6; /* Bleu */
+            color: white;
+            border-bottom-width: 4px;
+            border-bottom-color: #2563EB; /* Bleu plus foncé */
+        }
+        .tab-button:not(.active):hover {
+            background-color: #e5e7eb; /* Gris léger au survol */
+        }
+        .quiz-option {
+            transition: background-color 0.3s ease;
+        }
+        .quiz-option:not(:disabled):hover {
+            background-color: #eff6ff; /* Bleu très clair */
+        }
+        .quiz-option:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        /* Style pour les conteneurs d'exercices */
+        .exercise-section {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #d1d5db; /* border-gray-300 */
+        }
+        .exercise-section:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        /* Style pour le log interactif */
+        #for-log {
+            background-color: #0F172A; /* Bleu nuit */
+            color: #94A3B8; /* Gris-bleu */
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            height: 250px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+        }
+        #for-log p {
+            margin: 0;
+            padding: 2px 0;
+        }
+        #for-log p.success {
+            color: #22C55E; /* Vert */
+        }
+        #for-log p.fail {
+            color: #F87171; /* Rouge */
+        }
+        #for-log p.info {
+            color: #38BDF8; /* Bleu clair */
+        }
+        #for-log p.result {
+            color: #FDE047; /* Jaune */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
+        
+        <!-- En-tête -->
+        <header class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
+            <h1 class="text-3xl font-bold">Comprendre la Boucle <code>for</code> Arduino</h1>
+            <p class="mt-2 text-lg opacity-90">Répéter une action un nombre précis de fois.</p>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="p-6 md:p-8">
+
+            <!-- Section : Tabs interactives -->
+            <div>
+                <!-- Boutons des onglets -->
+                <div class="flex flex-wrap border-b border-gray-300 mb-6">
+                    <button class="tab-button active py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'syntaxe')">1. Syntaxe & Logique</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'usages')">3. Pièges & Cas d'usage</button>
+                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'exercices')">4. Exercices</button>
+                </div>
+
+                <!-- Contenu des onglets -->
+                <div id="tab-content">
+                    
+                    <!-- Onglet 1: Syntaxe & Logique -->
+                    <div id="syntaxe" class="tab-panel">
+                        <h3 class="text-xl font-semibold mb-4 text-blue-600">Qu'est-ce qu'une Boucle <code>for</code> ?</h3>
+                        <p class="mb-4">La boucle <code>for</code> ("Pour") est une structure de contrôle conçue pour répéter une action un <strong class="font-semibold">nombre défini de fois</strong>. Elle est parfaite pour dire "Fais ceci 5 fois" ou "Compte de 0 à 10".</p>
+                        <p>Elle est très populaire car elle regroupe en une seule ligne les 3 composants essentiels d'une boucle : l'initialisation, la condition d'arrêt, et l'incrémentation.</p>
+
+                        <h4 class="font-semibold mt-6 mb-2">Syntaxe</h4>
+                        <p>La boucle <code>for</code> se décompose ainsi :</p>
+                        <pre><code>for ( initialisation; condition; incrémentation ) {
+  // Bloc de code à répéter
+}</code></pre>
+
+                        <h4 class="font-semibold mt-6 mb-2">Décomposition</h4>
+                        <ol class="list-decimal list-inside space-y-2 mt-2">
+                            <li><strong>Initialisation :</strong> <code>int i = 0;</code>
+                                <p class="ml-6 text-gray-700">Une variable (souvent <code>i</code> pour "index" ou "itérateur") est créée et initialisée. <br>Exécuté <strong class="font-semibold">UNE SEULE FOIS</strong> au tout début.</p>
+                            </li>
+                            <li><strong>Condition :</strong> <code>i < 5;</code>
+                                <p class="ml-6 text-gray-700">Le code est vérifié <strong class="font-semibold">AVANT</strong> chaque tour. Si la condition est VRAIE, la boucle continue. Si elle est FAUSSE, la boucle s'arrête.</p>
+                            </li>
+                            <li><strong>Incrémentation :</strong> <code>i++</code>
+                                <p class="ml-6 text-gray-700">Le code est exécuté <strong class="font-semibold">APRÈS</strong> chaque tour de boucle. <code>i++</code> signifie "ajouter 1 à i".</p>
+                            </li>
+                        </ol>
+
+                        <h4 class="font-semibold mt-6 mb-2">Exemple : Compter de 0 à 4</h4>
+                        <p>Ce code va compter de 0 à 4 (soit 5 tours de boucle) :</p>
+                        <pre><code>for (int i = 0; i < 5; i++) {
+  Serial.println(i);
+}
+Serial.println("Fin");</code></pre>
+                        <p class="mt-2">Résultat :</p>
+                        <pre class="bg-gray-100 text-gray-800">0
+1
+2
+3
+4
+Fin</pre>
+                    </div>
+
+                    <!-- Onglet 2: Démo Interactive -->
+                    <div id="demo" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4">Testez la boucle <code>for</code> !</h3>
+                        <p class="mb-4">Nous allons simuler le code de l'exemple précédent. Observez le cycle : Condition -> Exécution -> Incrémentation.</p>
+                        
+                        <pre class="mb-4"><code>for (int i = 0; i < 5; i++) {
+  Serial.println(i);
+}</code></pre>
+
+                        <button id="demo-button" onclick="runForDemo()" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 mb-4 font-semibold">
+                            Démarrer la simulation
+                        </button>
+
+                        <h4 class="font-semibold mb-2">Log d'exécution :</h4>
+                        <div id="for-log">
+                            <p class="text-gray-500">Cliquez sur 'Démarrer' pour lancer la simulation...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Onglet 3: Pièges & Cas d'usage -->
+                    <div id="usages" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4 text-blue-600">Piège 1 : La Boucle Infinie</h3>
+                        <p class="mb-4">Une boucle <code>for</code> peut aussi devenir infinie si la condition d'arrêt n'est jamais atteinte. C'est souvent dû à une erreur dans l'incrémentation.</p>
+
+                        <pre><code>// Piège : i va devenir 0, -1, -2...
+// La condition (i < 5) sera TOUJOURS VRAIE !
+for (int i = 0; i < 5; i--) { 
+  Serial.println("Au secours !");
+  // On voulait écrire i++
+}</code></pre>
+                        
+                        <h3 class="text-xl font-semibold mb-4 mt-8 text-blue-600">Piège 2 : L'erreur "Off-by-One" (Décalage de un)</h3>
+                        <p class="mb-4">C'est l'erreur la plus classique. Si on veut 5 tours, doit-on écrire <code>i < 5</code> ou <code>i <= 5</code> ?</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h5 class="font-semibold"><code>i < 5</code> (Correct pour 5 tours)</h5>
+                                <pre><code>for (int i = 0; i < 5; i++) {
+  // i vaudra : 0, 1, 2, 3, 4
+}
+// TOTAL : 5 tours</code></pre>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold"><code>i <= 5</code> (Erreur : 6 tours)</h5>
+                                <pre><code>for (int i = 0; i <= 5; i++) {
+  // i vaudra : 0, 1, 2, 3, 4, 5
+}
+// TOTAL : 6 tours</code></pre>
+                            </div>
+                        </div>
+                        <p class="mt-4">L'habitude <strong class="font-semibold"><code>int i = 0; i < NOMBRE; i++</code></strong> est la plus sûre pour obtenir <code>NOMBRE</code> tours.</p>
+
+                        <h3 class="text-xl font-semibold mb-4 mt-8 text-blue-600">Cas d'usage : Variations</h3>
+                        <h4 class="font-semibold mt-6 mb-2">Compter à l'envers (Décrémentation)</h4>
+                        <p>On peut utiliser <code>i--</code> pour décompter.</p>
+                        <pre><code>// Compte à rebours de 5 à 1
+for (int i = 5; i > 0; i--) {
+  Serial.println(i);
+}
+Serial.println("Décollage !");</code></pre>
+                        
+                        <h4 class="font-semibold mt-6 mb-2">Compter par pas (Ex: 2 en 2)</h4>
+                        <p>L'incrémentation n'est pas obligée d'être <code>i++</code>.</p>
+                        <pre><code>// N'afficher que les nombres pairs
+for (int i = 0; i < 10; i = i + 2) {
+  // i vaudra : 0, 2, 4, 6, 8
+  Serial.println(i);
+}</code></pre>
+                    </div>
+
+                    <!-- Onglet 4: Exercices -->
+                    <div id="exercices" class="tab-panel" style="display:none;">
+                        <h3 class="text-xl font-semibold mb-4">Testez vos connaissances !</h3>
+                        
+                        <!-- Exercice 1 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-blue-600 mb-4">Exercice 1 : Combien de tours ?</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Combien de fois le mot "Test" sera affiché ?</p>
+                                <pre class="mb-4"><code>for (int k = 0; k < 3; k++) {
+  Serial.println("Test");
+}</code></pre>
+                                <div id="quiz-options-1" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 3)">A) 3 fois (pour k=0, 1, 2)</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 2)">B) 2 fois (pour k=0, 1)</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 4)">C) 4 fois (pour k=0, 1, 2, 3)</button>
+                                </div>
+                                <div id="quiz-feedback-1" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 2 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-blue-600 mb-4">Exercice 2 : L'erreur "Off-by-One"</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Combien de fois le mot "Test" sera affiché ?</p>
+                                <pre class="mb-4"><code>// Attention au <=
+for (int i = 0; i <= 3; i++) {
+  Serial.println("Test");
+}</code></pre>
+                                <div id="quiz-options-2" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 3)">A) 3 fois (pour i=0, 1, 2)</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 4)">B) 4 fois (pour i=0, 1, 2, 3)</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 5)">C) 5 fois (pour i=0, 1, 2, 3, 4)</button>
+                                </div>
+                                <div id="quiz-feedback-2" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 3 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-blue-600 mb-4">Exercice 3 : Compter à l'envers</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Qu'affichera ce code ?</p>
+                                <pre class="mb-4"><code>for (int i = 2; i > 0; i--) {
+  Serial.println(i);
+}</code></pre>
+                                <div id="quiz-options-3" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 'A')">A) 2, 1</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 'B')">B) 2, 1, 0</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 'C')">C) 2 (en boucle infinie)</button>
+                                </div>
+                                <div id="quiz-feedback-3" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 4 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-blue-600 mb-4">Exercice 4 : Boucle infinie ?</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Que se passe-t-il ici ?</p>
+                                <pre class="mb-4"><code>// Attention à l'incrémentation
+for (int i = 5; i > 0; i++) {
+  Serial.println(i);
+}</code></pre>
+                                <div id="quiz-options-4" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'A')">A) Le code affiche : 5, 4, 3, 2, 1</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'B')">B) Le code ne fait rien.</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'C')">C) Le code crée une boucle infinie (i=5, 6, 7...)</button>
+                                </div>
+                                <div id="quiz-feedback-4" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                        <!-- Exercice 5 -->
+                        <section class="exercise-section">
+                            <h4 class="text-lg font-semibold text-blue-600 mb-4">Exercice 5 : Pas de 2</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <p class="text-lg font-semibold mb-4">Qu'affichera ce code ?</D>
+                                <pre class="mb-4"><code>for (int i = 0; i < 5; i = i + 2) {
+  Serial.println(i);
+}</code></pre>
+                                <div id="quiz-options-5" class="space-y-3">
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'A')">A) 0, 1, 2, 3, 4</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'B')">B) 0, 2, 4</button>
+                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 'C')">C) 0, 2, 4, 6</button>
+                                </div>
+                                <div id="quiz-feedback-5" class="mt-4 text-lg font-semibold"></div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script>
+        // Logique des onglets
+        function openTab(event, tabName) {
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            tabPanels.forEach(panel => panel.style.display = 'none');
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active', 'text-gray-700'));
+
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        // Logique de la Démo Interactive
+        const logEl = document.getElementById('for-log');
+        const demoButton = document.getElementById('demo-button'); // Référence au bouton
+
+        function logMessage(message, type = '') {
+            logEl.innerHTML += `<p class="${type}">${message}</p>`;
+            logEl.scrollTop = logEl.scrollHeight; // Auto-scroll
+        }
+
+        // Helper function for delay
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        async function runForDemo() {
+            logEl.innerHTML = ''; // Nettoyer le log
+            demoButton.disabled = true;
+            demoButton.textContent = "Simulation en cours...";
+            
+            logMessage(`Simulation démarrée.`, 'info');
+            await delay(500);
+            
+            logMessage(`Initialisation : int i = 0;`);
+            let i = 0;
+            await delay(800);
+
+            while (true) {
+                logMessage(`Test Condition : (i < 5) ? (${i} < 5)`);
+                await delay(800);
+
+                if (!(i < 5)) {
+                    logMessage(`   -> Condition FAUSSE.`, 'fail');
+                    break; // Sortir de la boucle
+                }
+                
+                logMessage(`   -> Condition VRAIE.`, 'success');
+                await delay(500);
+                logMessage(`   -> Exécution bloc : Serial.println(${i})`);
+                await delay(500);
+                logMessage(`   -> Résultat : ${i}`, 'result');
+                await delay(1000);
+                
+                logMessage(`   -> Incrémentation : i++`);
+                i++;
+                logMessage(`   -> i vaut maintenant ${i}.`);
+                await delay(800);
+            }
+            
+            logMessage(`Sortie de la boucle.`, 'info');
+
+            demoButton.disabled = false;
+            demoButton.textContent = "Démarrer la simulation";
+        }
+
+
+        // --- Logique des Exercices ---
+        const correctAnswers = {
+            1: { val: 3, correct: 'Correct ! La boucle s\'exécute pour k=0, k=1, et k=2. À k=3, la condition (3 < 3) est fausse.', wrong: 'Incorrect. La boucle tourne 3 fois : k=0, k=1, k=2. (3 < 3) est faux.' },
+            2: { val: 4, correct: 'Correct ! La boucle s\'exécute pour i=0, i=1, i=2, et i=3. À i=4, la condition (4 <= 3) est fausse.', wrong: 'Incorrect. Le <= inclut le 3. La boucle tourne pour i=0, 1, 2, ET 3. Soit 4 tours.' },
+            3: { val: 'A', correct: 'Correct ! 1er tour: i=2. 2e tour: i=1. À i=0, la condition (0 > 0) est fausse. La boucle s\'arrête.', wrong: 'Incorrect. La condition est "i > 0". Quand i vaut 0, la boucle s\'arrête.' },
+            4: { val: 'C', correct: 'Correct ! i vaut 5 (vrai), 6 (vrai), 7 (vrai)... La condition (i > 0) sera toujours vraie car i augmente.', wrong: 'Incorrect. On décrémente (i--) pour aller vers 0. Ici, on incrémente (i++), donc i s\'éloigne de 0.' },
+            5: { val: 'B', correct: 'Correct ! 1er tour: i=0. 2e tour: i=2. 3e tour: i=4. À i=6, la condition (6 < 5) est fausse.', wrong: 'Incorrect. L\'incrémentation est "i = i + 2". Les valeurs de i seront 0, 2, puis 4.' }
+        };
+
+        function checkQuiz(quizNumber, selectedAnswer) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${quizNumber}`);
+            const optionsEl = document.getElementById(`quiz-options-${quizNumber}`);
+            
+            optionsEl.querySelectorAll('button').forEach(button => button.disabled = true);
+
+            const quizData = correctAnswers[quizNumber];
+            if (selectedAnswer === quizData.val) {
+                feedbackEl.textContent = quizData.correct;
+                feedbackEl.style.color = 'green';
+            } else {
+                feedbackEl.textContent = quizData.wrong;
+                feedbackEl.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>
