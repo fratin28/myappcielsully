@@ -80,7 +80,7 @@
       "description": "Créez des mots de passe robustes et sécurisés en un clic.",
       "lien": "cyber/generateur-mdp.html"
     },
-	{
+    {
       "categorie": "programmation",
       "titre": "Leçon Interactive : Le 'if' Arduino",
       "description": "Apprenez à utiliser l'instruction conditionnelle 'if' avec une démo et des exercices.",
@@ -88,15 +88,27 @@
     },
 	{
       "categorie": "programmation",
-      "titre": "Leçon Interactive : Le 'for' Arduino",
-      "description": "Apprenez à utiliser l'instruction conditionnelle 'for' avec une démo et des exercices.",
-      "lien": "programmation/FOR.html"
+      "titre": "Leçon Interactive : La boucle 'for'",
+      "description": "Maîtrisez les répétitions à nombre d'itérations connu avec la boucle 'for'.",
+      "lien": "programmation/for-arduino.html"
     },
     {
       "categorie": "programmation",
-      "titre": "Visualiseur de Flexbox CSS",
-      "description": "Un outil interactif pour comprendre le fonctionnement de Flexbox en CSS.",
-      "lien": "programmation/visualiseur-flexbox.html"
+      "titre": "Leçon Interactive : Les tableaux (Array)",
+      "description": "Apprenez à stocker et manipuler des collections de données dans des tableaux.",
+      "lien": "programmation/array-arduino.html"
+    },
+	{
+      "categorie": "programmation",
+      "titre": "Leçon Interactive : La boucle 'while'",
+      "description": "Découvrez comment répéter une action tant qu'une condition est vraie.",
+      "lien": "programmation/while-arduino.html"
+    },
+	{
+      "categorie": "programmation",
+      "titre": "Leçon Interactive : La boucle 'do...while'",
+      "description": "Apprenez à utiliser la boucle qui s'exécute toujours au moins une fois.",
+      "lien": "programmation/do-while-arduino.html"
     },
     {
       "categorie": "programmation",

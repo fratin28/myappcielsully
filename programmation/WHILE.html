@@ -3,404 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apprendre la Boucle 'while' Arduino</title>
-    <!-- Chargement de Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Police Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Leçon Interactive | Boucle 'while' Arduino</title>
+    
+    <!-- Lien vers la feuille de style principale du site -->
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <!-- Styles spécifiques à CETTE page -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Gris clair */
-        }
-        /* Style pour les blocs de code */
-        pre {
-            background-color: #1E293B; /* Bleu-gris foncé */
-            color: #E2E8F0; /* Gris clair */
-            padding: 1rem;
-            border-radius: 0.5rem; /* Coins arrondis */
-            overflow-x: auto;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .tab-button {
-            transition: all 0.3s ease;
-        }
-        /* Thème Indigo */
-        .tab-button.active {
-            background-color: #6366F1; /* Indigo */
-            color: white;
-            border-bottom-width: 4px;
-            border-bottom-color: #4F46E5; /* Indigo plus foncé */
-        }
-        .tab-button:not(.active):hover {
-            background-color: #e5e7eb; /* Gris léger au survol */
-        }
-        .quiz-option {
-            transition: background-color 0.3s ease;
-        }
-        .quiz-option:not(:disabled):hover {
-            background-color: #e0e7ff; /* Indigo très clair */
-        }
-        .quiz-option:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        /* Style pour les conteneurs d'exercices */
-        .exercise-section {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #d1d5db; /* border-gray-300 */
-        }
-        .exercise-section:first-child {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-        }
-        /* Style pour le log interactif */
-        #while-log {
-            background-color: #0F172A; /* Bleu nuit */
-            color: #94A3B8; /* Gris-bleu */
-            font-family: 'Courier New', Courier, monospace;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            height: 250px;
-            overflow-y: auto;
-            border: 1px solid #334155;
-        }
-        #while-log p {
-            margin: 0;
-            padding: 2px 0;
-        }
-        #while-log p.success {
-            color: #22C55E; /* Vert */
-        }
-        #while-log p.fail {
-            color: #F87171; /* Rouge */
-        }
-        #while-log p.info {
-            color: #38BDF8; /* Bleu clair */
-        }
-        #while-log p.result {
-            color: #FDE047; /* Jaune */
-            font-weight: bold;
-        }
+        .lesson-container { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem 2rem; text-align: left; }
+        .tabs-nav { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .tab-button { padding: 0.8rem 1.2rem; cursor: pointer; background: none; border: none; color: var(--text-light); font-size: 1rem; font-weight: 500; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
+        .tab-button:hover { background-color: rgba(255, 255, 255, 0.05); }
+        .tab-button.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        pre { background-color: #1E293B; color: #E2E8F0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace; border: 1px solid var(--border-color); margin: 1rem 0; }
+        code { font-family: 'Source Code Pro', monospace; color: var(--accent-blue); background-color: rgba(0, 191, 255, 0.1); padding: 2px 5px; border-radius: 4px; }
+        h3 { font-size: 1.5rem; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text-heading); }
+        h4 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-light); }
+        p, ul { margin-bottom: 1rem; }
+        ul { list-style-position: inside; }
+        .interactive-demo { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+        .lesson-input { background-color: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-light); padding: 0.5rem; border-radius: 5px; width: 80px; }
+        .lesson-button { background-color: var(--accent-blue); color: var(--bg-dark); border: none; padding: 0.6rem 1.2rem; border-radius: 5px; cursor: pointer; font-weight: bold; transition: transform 0.2s ease; }
+        .lesson-button:hover { transform: scale(1.05); }
+        #while-log { background-color: #0F172A; color: #94A3B8; font-family: 'Source Code Pro', monospace; padding: 1rem; border-radius: 0.5rem; height: 250px; overflow-y: auto; border: 1px solid #334155; }
+        #while-log p { margin: 0; padding: 2px 0; }
+        #while-log p.success { color: #22C55E; }
+        #while-log p.fail { color: #F87171; }
+        #while-log p.info { color: #38BDF8; }
+        #while-log p.iter { color: #FDE047; }
+        .exercise-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        .exercise-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+        .exercise-box { background-color: rgba(0,0,0,0.15); padding: 1.5rem; border-radius: 8px; }
+        .quiz-option { display: block; width: 100%; text-align: left; padding: 0.8rem; margin-top: 0.5rem; background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-light); cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease; }
+        .quiz-option:hover:not(:disabled) { background-color: #3e4263; }
+        .quiz-option:disabled { opacity: 0.7; cursor: not-allowed; }
+        .quiz-feedback { margin-top: 1rem; font-weight: bold; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900 p-4 md:p-8">
+<body>
 
-    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
-        
-        <!-- En-tête -->
-        <header class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-6">
-            <h1 class="text-3xl font-bold">Comprendre la Boucle <code>while</code> Arduino</h1>
-            <p class="mt-2 text-lg opacity-90">Répéter une action TANT QU'une condition est vraie.</p>
-        </header>
+    <header>
+        <h1>Leçon : La boucle <code>while</code> (Tant que)</h1>
+        <p><a href="../programmation.html" class="back-link">&larr; Retour aux applications de programmation</a></p>
+    </header>
 
-        <!-- Contenu principal -->
-        <main class="p-6 md:p-8">
-
-            <!-- Section : Tabs interactives -->
-            <div>
-                <!-- Boutons des onglets -->
-                <div class="flex flex-wrap border-b border-gray-300 mb-6">
-                    <button class="tab-button active py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'definition')">1. Définition & Syntaxe</button>
-                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
-                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'usages')">3. Pièges & Cas d'usage</button>
-                    <button class="tab-button py-3 px-6 font-semibold text-gray-700" onclick="openTab(event, 'exercices')">4. Exercices</button>
-                </div>
-
-                <!-- Contenu des onglets -->
-                <div id="tab-content">
-                    
-                    <!-- Onglet 1: Définition & Syntaxe -->
-                    <div id="definition" class="tab-panel">
-                        <h3 class="text-xl font-semibold mb-4 text-indigo-600">Qu'est-ce qu'une Boucle <code>while</code> ?</h3>
-                        <p class="mb-4">La boucle <code>while</code> ("Tant que") est la forme de boucle la plus fondamentale. C'est une structure de contrôle qui répète un bloc de code <strong class="font-semibold">tant qu'une condition spécifiée reste vraie</strong>.</p>
-                        <p>Son principe clé est que la condition est <strong class="font-semibold">testée AVANT</strong> chaque exécution du bloc de code. Si la condition est fausse dès le début, la boucle ne s'exécutera jamais.</p>
-
-                        <h4 class="font-semibold mt-6 mb-2">Syntaxe</h4>
-                        <p>La syntaxe est très simple :</p>
-                        <pre><code>while (condition) {
-  // Bloc de code à répéter
-  // ...
-  // Il faut que quelque chose ici finisse
-  // par rendre la condition fausse !
-}</code></pre>
-
-                        <h4 class="font-semibold mt-6 mb-2">Exemple : Compteur</h4>
-                        <p>Le code suivant va compter de 0 à 4. Observez bien la ligne <code>i++</code>, elle est cruciale.</p>
-                        <pre><code>int i = 0; // 1. Initialisation
-
-while (i < 5) { // 2. Condition (testée avant chaque tour)
-  Serial.println(i);
-  i++; // 3. Modification (pour éviter une boucle infinie)
-}
-Serial.println("Fin");</code></pre>
-                        <p class="mt-2">Résultat :</p>
-                        <pre class="bg-gray-100 text-gray-800">0
-1
-2
-3
-4
-Fin</pre>
-                    </div>
-
-                    <!-- Onglet 2: Démo Interactive -->
-                    <div id="demo" class="tab-panel" style="display:none;">
-                        <h3 class="text-xl font-semibold mb-4">Testez la boucle <code>while</code> !</h3>
-                        <p class="mb-4">Nous allons simuler l'exemple du compteur (compter de 0 à 3). Observez comment la condition est testée avant chaque tour.</p>
-                        
-                        <pre class="mb-4"><code>int i = 0;
-while (i < 3) {
-  Serial.println(i);
-  i++;
-}</code></pre>
-
-                        <button id="demo-button" onclick="runWhileDemo()" class="bg-indigo-500 text-white px-6 py-2 rounded-md hover:bg-indigo-600 mb-4 font-semibold">
-                            Démarrer la simulation
-                        </button>
-
-                        <h4 class="font-semibold mb-2">Log d'exécution :</h4>
-                        <div id="while-log">
-                            <p class="text-gray-500">Cliquez sur 'Démarrer' pour lancer la simulation...</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Onglet 3: Pièges & Cas d'usage -->
-                    <div id="usages" class="tab-panel" style="display:none;">
-                        <h3 class="text-xl font-semibold mb-4 text-indigo-600">Piège 1 : La Boucle Infinie</h3>
-                        <p class="mb-4">C'est le piège le plus courant avec <code>while</code>. Si vous oubliez de modifier la variable de la condition, celle-ci reste vraie <strong class="font-semibold">pour toujours</strong>.</p>
-
-                        <pre><code>int i = 0;
-while (i < 5) {
-  // OUPS ! On a oublié i++
-  Serial.println("Cette ligne s'affichera à l'infini !");
-  delay(500);
-}
-// Le programme est bloqué ici et n'ira jamais plus loin.</code></pre>
-                        
-                        <h3 class="text-xl font-semibold mb-4 mt-8 text-indigo-600">Cas d'usage 1 : Remplacer `delay()` (attendre une action)</h3>
-                        <p class="mb-4">C'est l'une des utilisations les plus puissantes : attendre qu'un événement se produise (comme un appui sur un bouton) sans bloquer le reste du code de la même manière qu'un <code>delay()</code>.</p>
-                        <p>C'est le code pour un montage en <strong class="font-semibold">pull-down</strong> (le bouton passe à HIGH quand il est pressé).</p>
-                        <pre><code>// Attend TANT QUE le bouton est LOW (non pressé)
-while (digitalRead(buttonPin) == LOW) {
-  // Ne rien faire, juste attendre...
-  // (on peut faire clignoter une LED ici)
-}
-// Le code continue ici SEULEMENT quand le bouton est HIGH (pressé)
-Serial.println("Bouton pressé !");</code></pre>
-
-                        <h3 class="text-xl font-semibold mb-4 mt-8 text-indigo-600">Cas d'usage 2 : Lire un capteur jusqu'à un seuil</h3>
-                        <p class="mb-4">Vous voulez attendre que la lumière dans une pièce atteigne un certain seuil avant de continuer.</p>
-                        <pre><code>int luminosite = 0;
-
-// TANT QUE la valeur est sous 500
-while (luminosite < 500) {
-  // On re-mesure la luminosité
-  luminosite = analogRead(A0); 
-  delay(10); // Petit délai pour stabiliser
-}
-// Le code sort de la boucle
-Serial.println("Il fait assez jour !");</code></pre>
-                    </div>
-
-                    <!-- Onglet 4: Exercices -->
-                    <div id="exercices" class="tab-panel" style="display:none;">
-                        <h3 class="text-xl font-semibold mb-4">Testez vos connaissances !</h3>
-                        
-                        <!-- Exercice 1 -->
-                        <section class="exercise-section">
-                            <h4 class="text-lg font-semibold text-indigo-600 mb-4">Exercice 1 : Combien de tours ?</h4>
-                            <div class="bg-gray-50 p-6 rounded-lg">
-                                <p class="text-lg font-semibold mb-4">Combien de fois le mot "Tour" sera affiché ?</p>
-                                <pre class="mb-4"><code>int i = 0;
-while (i < 3) {
-  Serial.println("Tour");
-  i++;
-}</code></pre>
-                                <div id="quiz-options-1" class="space-y-3">
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 3)">A) 3 fois (pour i=0, 1, 2)</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 2)">B) 2 fois (pour i=0, 1)</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(1, 4)">C) 4 fois (pour i=0, 1, 2, 3)</button>
-                                </div>
-                                <div id="quiz-feedback-1" class="mt-4 text-lg font-semibold"></div>
-                            </div>
-                        </section>
-
-                        <!-- Exercice 2 -->
-                        <section class="exercise-section">
-                            <h4 class="text-lg font-semibold text-indigo-600 mb-4">Exercice 2 : La boucle infinie</h4>
-                            <div class="bg-gray-50 p-6 rounded-lg">
-                                <p class="text-lg font-semibold mb-4">Que va faire ce code ?</p>
-                                <pre class="mb-4"><code>int i = 5;
-while (i > 0) {
-  Serial.println(i);
-  // Oups, pas de i--
-}</code></pre>
-                                <div id="quiz-options-2" class="space-y-3">
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 'A')">A) Il va afficher "5" à l'infini.</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 'B')">B) Il va compter de 5 à 1.</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(2, 'C')">C) Il ne va rien afficher.</button>
-                                </div>
-                                <div id="quiz-feedback-2" class="mt-4 text-lg font-semibold"></div>
-                            </div>
-                        </section>
-
-                        <!-- Exercice 3 -->
-                        <section class="exercise-section">
-                            <h4 class="text-lg font-semibold text-indigo-600 mb-4">Exercice 3 : Zéro tour</h4>
-                            <div class="bg-gray-50 p-6 rounded-lg">
-                                <p class="text-lg font-semibold mb-4">Combien de fois le mot "Test" sera affiché ?</p>
-                                <pre class="mb-4"><code>int i = 5;
-while (i < 5) {
-  Serial.println("Test");
-  i++;
-}</code></pre>
-                                <div id="quiz-options-3" class="space-y-3">
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 1)">A) 1 fois</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 5)">B) 5 fois</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(3, 0)">C) 0 fois</button>
-                                </div>
-                                <div id="quiz-feedback-3" class="mt-4 text-lg font-semibold"></div>
-                            </div>
-                        </section>
-
-                        <!-- Exercice 4 -->
-                        <section class="exercise-section">
-                            <h4 class="text-lg font-semibold text-indigo-600 mb-4">Exercice 4 : Attendre un appui (Pull-down)</h4>
-                            <div class="bg-gray-50 p-6 rounded-lg">
-                                <p class="text-lg font-semibold mb-4">J'ai un bouton en PULL-DOWN. Je veux attendre qu'il soit <strong class="font-semibold">pressé</strong> (donc qu'il passe à HIGH). Quelle est la bonne condition ?</p>
-                                <pre class="mb-4"><code>while ( ...? ... ) {
-  // Attendre
-}</code></pre>
-                                <div id="quiz-options-4" class="space-y-3">
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'A')">A) <code>digitalRead(pin) == HIGH</code></button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'B')">B) <code>digitalRead(pin) == LOW</code></button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(4, 'C')">C) <code>analogRead(pin) < 100</code></button>
-                                </div>
-                                <div id="quiz-feedback-4" class="mt-4 text-lg font-semibold"></div>
-                            </div>
-                        </section>
-
-                        <!-- Exercice 5 -->
-                        <section class="exercise-section">
-                            <h4 class="text-lg font-semibold text-indigo-600 mb-4">Exercice 5 : Valeur de sortie</h4>
-                            <div class="bg-gray-50 p-6 rounded-lg">
-                                <p class="text-lg font-semibold mb-4">Que vaut <code>i</code> APRÈS la fin de cette boucle ?</p>
-                                <pre class="mb-4"><code>int i = 0;
-while (i < 10) {
-  i++;
-}
-Serial.println(i);</code></pre>
-                                <div id="quiz-options-5" class="space-y-3">
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 9)">A) 9</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 10)">B) 10</button>
-                                    <button class="quiz-option w-full text-left p-3 border rounded-md" onclick="checkQuiz(5, 0)">C) 0</button>
-                                </div>
-                                <div id="quiz-feedback-5" class="mt-4 text-lg font-semibold"></div>
-                            </div>
-                        </section>
-
-                    </div>
-
-                </div>
+    <main class="container">
+        <div class="lesson-container">
+            
+            <div class="tabs-nav">
+                <button class="tab-button active" onclick="openTab(event, 'definition')">1. Définition & Syntaxe</button>
+                <button class="tab-button" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
+                <button class="tab-button" onclick="openTab(event, 'pieges')">3. Pièges & Erreurs</button>
+                <button class="tab-button" onclick="openTab(event, 'exercices')">4. Exercices</button>
             </div>
 
-        </main>
-    </div>
+            <div id="tab-content">
+                
+                <div id="definition" class="tab-panel">
+                    <h3>Qu'est-ce qu'une Boucle <code>while</code> ?</h3>
+                    <p>La boucle <code>while</code> ("Tant que") répète un bloc de code <strong>tant qu'une condition spécifiée est vraie</strong>. Elle est parfaite quand on ne sait pas à l'avance combien de tours de boucle seront nécessaires, par exemple pour attendre une action de l'utilisateur.</p>
+                    <p>Le fonctionnement est simple : <strong>1. On teste la condition. 2. Si elle est vraie, on exécute le code. 3. On retourne à l'étape 1.</strong> Si la condition est fausse dès le départ, la boucle ne s'exécute jamais.</p>
+                    <h4>Syntaxe de <code>while</code></h4>
+                    <pre><code>// On initialise une variable avant la boucle
+int compteur = 0;
 
-    <!-- Script JavaScript -->
+// On teste la condition ici
+while (compteur < 5) { // Tant que compteur est inférieur à 5...
+  Serial.println(compteur);
+  
+  // TRÈS IMPORTANT : il faut modifier la variable de la condition !
+  compteur++; 
+}
+// Le code arrive ici quand compteur vaut 5.</code></pre>
+                </div>
+
+                <div id="demo" class="tab-panel" style="display:none;">
+                    <h3>Testez la logique <code>while</code> !</h3>
+                    <p>Simulons un capteur qui doit atteindre une valeur seuil. La boucle tournera "tant que" la valeur lue est inférieure au seuil.</p>
+                    <pre><code>int valeurLue = 0;
+int seuil = [Votre Valeur];
+while (valeurLue < seuil) {
+  // ... on incrémente la valeur pour la simulation
+  valeurLue += 10;
+}</code></pre>
+                    <div class="interactive-demo">
+                         <label for="seuil-input">Seuil à atteindre :</label>
+                         <input type="number" id="seuil-input" class="lesson-input" value="50" placeholder="ex: 80">
+                         <button id="demo-button" onclick="runWhileDemo()" class="lesson-button">Lancer</button>
+                    </div>
+                    <h4>Log d'exécution :</h4>
+                    <div id="while-log"><p>Entrez un seuil et cliquez sur 'Lancer'...</p></div>
+                </div>
+                
+                <div id="pieges" class="tab-panel" style="display:none;">
+                    <h3>Piège 1 : La Boucle Infinie</h3>
+                    <p>C'est l'erreur la plus courante avec <code>while</code>. Si la condition de la boucle ne devient jamais fausse, votre programme restera bloqué à l'intérieur pour toujours !</p>
+                    <pre><code>int i = 0;
+// ERREUR ! i n'est jamais modifié dans la boucle.
+// La condition (i < 10) sera donc toujours vraie.
+while (i < 10) {
+  Serial.println("Au secours, je suis bloqué !");
+  // On a oublié d'écrire "i++;"
+}</code></pre>
+                    <h3>Piège 2 : Quand utiliser <code>while</code> ou <code>for</code> ?</h3>
+                    <p>Les deux peuvent parfois accomplir la même chose, mais il y a une règle simple :</p>
+                    <ul>
+                        <li>Utilisez <code>for</code> quand vous savez <strong>combien de fois</strong> vous devez répéter (ex: "clignoter 5 fois").</li>
+                        <li>Utilisez <code>while</code> quand vous répétez jusqu'à ce qu'un <strong>événement se produise</strong> (ex: "attendre qu'un bouton soit pressé").</li>
+                    </ul>
+                </div>
+
+                <div id="exercices" class="tab-panel" style="display:none;">
+                    <h3>Testez vos connaissances !</h3>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 1 : Boucle <code>while</code> simple</h4>
+                            <p>Combien de fois le mot "Tic" sera-t-il affiché ?</p>
+                            <pre><code>int x = 0;
+while (x < 3) {
+  Serial.println("Tic");
+  x++;
+}</code></pre>
+                            <div id="quiz-options-1">
+                                <button class="quiz-option" onclick="checkQuiz(1, 'A')">A) 2 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'B')">B) 3 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'C')">C) 4 fois</button>
+                            </div><div id="quiz-feedback-1" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 2 : La boucle infinie</h4>
+                            <p>Quel est le problème dans ce code ?</p>
+                            <pre><code>int val = 10;
+while (val > 0) {
+  Serial.println("Décompte...");
+  val + 1; // Oups...
+}</code></pre>
+                            <div id="quiz-options-2">
+                                <button class="quiz-option" onclick="checkQuiz(2, 'A')">A) La condition est toujours vraie</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'B')">B) La condition est toujours fausse</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'C')">C) Erreur de syntaxe</button>
+                            </div><div id="quiz-feedback-2" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - Profs CIEL / Lycée des métiers SULLY</p>
+    </footer>
+
     <script>
-        // Logique des onglets
         function openTab(event, tabName) {
-            const tabPanels = document.querySelectorAll('.tab-panel');
-            tabPanels.forEach(panel => panel.style.display = 'none');
-
-            const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => button.classList.remove('active', 'text-gray-700'));
-
+            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
             document.getElementById(tabName).style.display = 'block';
             event.currentTarget.classList.add('active');
         }
-
-        // Logique de la Démo Interactive
         const logEl = document.getElementById('while-log');
-        const demoButton = document.getElementById('demo-button'); // Référence au bouton
-
-        function logMessage(message, type = '') {
-            logEl.innerHTML += `<p class="${type}">${message}</p>`;
-            logEl.scrollTop = logEl.scrollHeight; // Auto-scroll
-        }
-
-        // Helper function for delay
+        const inputEl = document.getElementById('seuil-input');
         const delay = ms => new Promise(res => setTimeout(res, ms));
-
+        function logMessage(message, type = '') { logEl.innerHTML += `<p class="${type}">${message}</p>`; logEl.scrollTop = logEl.scrollHeight; }
         async function runWhileDemo() {
-            logEl.innerHTML = ''; // Nettoyer le log
-            demoButton.disabled = true;
-            demoButton.textContent = "Simulation en cours...";
-            
-            logMessage(`Simulation démarrée.`, 'info');
-            await delay(500);
-            
-            logMessage(`Initialisation : int i = 0;`);
-            let i = 0;
-            await delay(800);
-
-            while (true) {
-                logMessage(`Test Condition : (i < 3) ? (${i} < 3)`);
-                await delay(800);
-
-                if (!(i < 3)) {
-                    logMessage(`   -> Condition FAUSSE.`, 'fail');
-                    break; // Sortir de la boucle while(true) de simulation
-                }
-                
-                logMessage(`   -> Condition VRAIE.`, 'success');
-                await delay(500);
-                logMessage(`   -> Exécution bloc : Serial.println(${i})`);
-                await delay(500);
-                logMessage(`   -> Résultat : ${i}`, 'result');
-                await delay(800);
-                
-                logMessage(`   -> Exécution bloc : i++`);
-                i++;
-                logMessage(`   -> i vaut maintenant ${i}.`);
-                await delay(1000);
+            logEl.innerHTML = '';
+            const seuil = parseInt(inputEl.value);
+            if (isNaN(seuil) || seuil < 10 || seuil > 500) {
+                logMessage("Erreur : Entrez un seuil entre 10 et 500.", 'fail'); return;
             }
-            
-            logMessage(`Sortie de la boucle.`, 'info');
-
-            demoButton.disabled = false;
-            demoButton.textContent = "Démarrer la simulation";
+            logMessage(`Simulation. Seuil à atteindre = ${seuil}`, 'info'); await delay(500);
+            let valeurLue = 0;
+            logMessage(`Initialisation : valeurLue = ${valeurLue};`); await delay(800);
+            while(valeurLue < seuil) {
+                logMessage(`Test : (valeurLue < ${seuil}) ? (${valeurLue} < ${seuil}) -> VRAI.`, 'success'); await delay(600);
+                logMessage(`   Exécution du code...`); await delay(400);
+                valeurLue += 10;
+                logMessage(`   Nouvelle valeurLue = ${valeurLue}`, 'iter'); await delay(800);
+            }
+            logMessage(`Test : (valeurLue < ${seuil}) ? (${valeurLue} < ${seuil}) -> FAUX.`, 'fail'); await delay(800);
+            logMessage(`Fin de la boucle.`, 'info');
         }
-
-
-        // --- Logique des Exercices ---
         const correctAnswers = {
-            1: { val: 3, correct: 'Correct ! La boucle s\'exécute pour i=0, i=1, et i=2. À i=3, la condition (3 < 3) est fausse.', wrong: 'Incorrect. La boucle tourne 3 fois : i=0, i=1, i=2. (3 < 3) est faux.' },
-            2: { val: 'A', correct: 'Correct ! La variable i vaut 5 et ne change jamais. La condition (5 > 0) est toujours vraie.', wrong: 'Incorrect. La variable i ne change jamais, la condition reste toujours vraie.' },
-            3: { val: 0, correct: 'Correct ! La condition (5 < 5) est fausse dès le début. La boucle ne s\'exécute jamais.', wrong: 'Incorrect. La condition est testée AVANT. (5 < 5) est faux, donc la boucle est sautée.' },
-            4: { val: 'B', correct: 'Correct ! On attend TANT QUE le bouton est LOW (au repos). On sort quand il passe HIGH.', wrong: 'Incorrect. On veut attendre TANT QUE le bouton est au repos (LOW en pull-down).' },
-            5: { val: 10, correct: 'Correct ! La boucle s\'arrête quand i=10 (car 10 < 10 est faux). La valeur de i est donc 10.', wrong: 'Incorrect. La boucle s\'exécute pour i=9 (9<10), i++ (i=10). Test: (10<10) -> Faux. On sort. i vaut 10.' }
+            1: { val: 'B', correct: 'Correct ! La boucle s\'exécute pour x=0, x=1 et x=2, soit 3 fois.', wrong: 'Incorrect. La condition x < 3 est vraie pour 0, 1 et 2.' },
+            2: { val: 'A', correct: 'Correct ! "val + 1" calcule une valeur mais ne la stocke pas. "val" reste toujours à 10. Il aurait fallu écrire "val--" ou "val = val - 1".', wrong: 'Incorrect. La ligne "val + 1;" ne modifie pas la variable "val", donc elle reste toujours supérieure à 0.' }
         };
-
-        function checkQuiz(quizNumber, selectedAnswer) {
-            const feedbackEl = document.getElementById(`quiz-feedback-${quizNumber}`);
-            const optionsEl = document.getElementById(`quiz-options-${quizNumber}`);
-            
-            optionsEl.querySelectorAll('button').forEach(button => button.disabled = true);
-
-            const quizData = correctAnswers[quizNumber];
-            if (selectedAnswer === quizData.val) {
-                feedbackEl.textContent = quizData.correct;
-                feedbackEl.style.color = 'green';
-            } else {
-                feedbackEl.textContent = quizData.wrong;
-                feedbackEl.style.color = 'red';
-            }
+        function checkQuiz(quizNum, answer) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${quizNum}`);
+            document.querySelectorAll(`#quiz-options-${quizNum} button`).forEach(b => b.disabled = true);
+            const isCorrect = (answer === correctAnswers[quizNum].val);
+            const data = correctAnswers[quizNum];
+            feedbackEl.textContent = isCorrect ? data.correct : data.wrong;
+            feedbackEl.style.color = isCorrect ? '#22C55E' : '#F87171';
         }
     </script>
 </body>
