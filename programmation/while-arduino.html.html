@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon Interactive | Boucle 'while' Arduino</title>
+    
+    <!-- Lien vers la feuille de style principale du site -->
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <!-- Styles spécifiques à CETTE page -->
+    <style>
+        .lesson-container { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem 2rem; text-align: left; }
+        .tabs-nav { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .tab-button { padding: 0.8rem 1.2rem; cursor: pointer; background: none; border: none; color: var(--text-light); font-size: 1rem; font-weight: 500; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
+        .tab-button:hover { background-color: rgba(255, 255, 255, 0.05); }
+        .tab-button.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        pre { background-color: #1E293B; color: #E2E8F0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace; border: 1px solid var(--border-color); margin: 1rem 0; }
+        code { font-family: 'Source Code Pro', monospace; color: var(--accent-blue); background-color: rgba(0, 191, 255, 0.1); padding: 2px 5px; border-radius: 4px; }
+        h3 { font-size: 1.5rem; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text-heading); }
+        h4 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-light); }
+        p, ul { margin-bottom: 1rem; }
+        ul { list-style-position: inside; }
+        .interactive-demo { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+        .lesson-input { background-color: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-light); padding: 0.5rem; border-radius: 5px; width: 80px; }
+        .lesson-button { background-color: var(--accent-blue); color: var(--bg-dark); border: none; padding: 0.6rem 1.2rem; border-radius: 5px; cursor: pointer; font-weight: bold; transition: transform 0.2s ease; }
+        .lesson-button:hover { transform: scale(1.05); }
+        #while-log { background-color: #0F172A; color: #94A3B8; font-family: 'Source Code Pro', monospace; padding: 1rem; border-radius: 0.5rem; height: 250px; overflow-y: auto; border: 1px solid #334155; }
+        #while-log p { margin: 0; padding: 2px 0; }
+        #while-log p.success { color: #22C55E; }
+        #while-log p.fail { color: #F87171; }
+        #while-log p.info { color: #38BDF8; }
+        #while-log p.iter { color: #FDE047; }
+        .exercise-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        .exercise-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+        .exercise-box { background-color: rgba(0,0,0,0.15); padding: 1.5rem; border-radius: 8px; }
+        .quiz-option { display: block; width: 100%; text-align: left; padding: 0.8rem; margin-top: 0.5rem; background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-light); cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease; }
+        .quiz-option:hover:not(:disabled) { background-color: #3e4263; }
+        .quiz-option:disabled { opacity: 0.7; cursor: not-allowed; }
+        .quiz-feedback { margin-top: 1rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Leçon : La boucle <code>while</code> (Tant que)</h1>
+        <p><a href="../programmation.html" class="back-link">&larr; Retour aux applications de programmation</a></p>
+    </header>
+
+    <main class="container">
+        <div class="lesson-container">
+            
+            <div class="tabs-nav">
+                <button class="tab-button active" onclick="openTab(event, 'definition')">1. Définition & Syntaxe</button>
+                <button class="tab-button" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
+                <button class="tab-button" onclick="openTab(event, 'pieges')">3. Pièges & Erreurs</button>
+                <button class="tab-button" onclick="openTab(event, 'exercices')">4. Exercices</button>
+            </div>
+
+            <div id="tab-content">
+                
+                <div id="definition" class="tab-panel">
+                    <h3>Qu'est-ce qu'une Boucle <code>while</code> ?</h3>
+                    <p>La boucle <code>while</code> ("Tant que") répète un bloc de code <strong>tant qu'une condition spécifiée est vraie</strong>. Elle est parfaite quand on ne sait pas à l'avance combien de tours de boucle seront nécessaires, par exemple pour attendre une action de l'utilisateur.</p>
+                    <p>Le fonctionnement est simple : <strong>1. On teste la condition. 2. Si elle est vraie, on exécute le code. 3. On retourne à l'étape 1.</strong> Si la condition est fausse dès le départ, la boucle ne s'exécute jamais.</p>
+                    <h4>Syntaxe de <code>while</code></h4>
+                    <pre><code>// On initialise une variable avant la boucle
+int compteur = 0;
+
+// On teste la condition ici
+while (compteur < 5) { // Tant que compteur est inférieur à 5...
+  Serial.println(compteur);
+  
+  // TRÈS IMPORTANT : il faut modifier la variable de la condition !
+  compteur++; 
+}
+// Le code arrive ici quand compteur vaut 5.</code></pre>
+                </div>
+
+                <div id="demo" class="tab-panel" style="display:none;">
+                    <h3>Testez la logique <code>while</code> !</h3>
+                    <p>Simulons un capteur qui doit atteindre une valeur seuil. La boucle tournera "tant que" la valeur lue est inférieure au seuil.</p>
+                    <pre><code>int valeurLue = 0;
+int seuil = [Votre Valeur];
+while (valeurLue < seuil) {
+  // ... on incrémente la valeur pour la simulation
+  valeurLue += 10;
+}</code></pre>
+                    <div class="interactive-demo">
+                         <label for="seuil-input">Seuil à atteindre :</label>
+                         <input type="number" id="seuil-input" class="lesson-input" value="50" placeholder="ex: 80">
+                         <button id="demo-button" onclick="runWhileDemo()" class="lesson-button">Lancer</button>
+                    </div>
+                    <h4>Log d'exécution :</h4>
+                    <div id="while-log"><p>Entrez un seuil et cliquez sur 'Lancer'...</p></div>
+                </div>
+                
+                <div id="pieges" class="tab-panel" style="display:none;">
+                    <h3>Piège 1 : La Boucle Infinie</h3>
+                    <p>C'est l'erreur la plus courante avec <code>while</code>. Si la condition de la boucle ne devient jamais fausse, votre programme restera bloqué à l'intérieur pour toujours !</p>
+                    <pre><code>int i = 0;
+// ERREUR ! i n'est jamais modifié dans la boucle.
+// La condition (i < 10) sera donc toujours vraie.
+while (i < 10) {
+  Serial.println("Au secours, je suis bloqué !");
+  // On a oublié d'écrire "i++;"
+}</code></pre>
+                    <h3>Piège 2 : Quand utiliser <code>while</code> ou <code>for</code> ?</h3>
+                    <p>Les deux peuvent parfois accomplir la même chose, mais il y a une règle simple :</p>
+                    <ul>
+                        <li>Utilisez <code>for</code> quand vous savez <strong>combien de fois</strong> vous devez répéter (ex: "clignoter 5 fois").</li>
+                        <li>Utilisez <code>while</code> quand vous répétez jusqu'à ce qu'un <strong>événement se produise</strong> (ex: "attendre qu'un bouton soit pressé").</li>
+                    </ul>
+                </div>
+
+                <div id="exercices" class="tab-panel" style="display:none;">
+                    <h3>Testez vos connaissances !</h3>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 1 : Boucle <code>while</code> simple</h4>
+                            <p>Combien de fois le mot "Tic" sera-t-il affiché ?</p>
+                            <pre><code>int x = 0;
+while (x < 3) {
+  Serial.println("Tic");
+  x++;
+}</code></pre>
+                            <div id="quiz-options-1">
+                                <button class="quiz-option" onclick="checkQuiz(1, 'A')">A) 2 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'B')">B) 3 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'C')">C) 4 fois</button>
+                            </div><div id="quiz-feedback-1" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 2 : La boucle infinie</h4>
+                            <p>Quel est le problème dans ce code ?</p>
+                            <pre><code>int val = 10;
+while (val > 0) {
+  Serial.println("Décompte...");
+  val + 1; // Oups...
+}</code></pre>
+                            <div id="quiz-options-2">
+                                <button class="quiz-option" onclick="checkQuiz(2, 'A')">A) La condition est toujours vraie</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'B')">B) La condition est toujours fausse</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'C')">C) Erreur de syntaxe</button>
+                            </div><div id="quiz-feedback-2" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - Profs CIEL / Lycée des métiers SULLY</p>
+    </footer>
+
+    <script>
+        function openTab(event, tabName) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+        const logEl = document.getElementById('while-log');
+        const inputEl = document.getElementById('seuil-input');
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+        function logMessage(message, type = '') { logEl.innerHTML += `<p class="${type}">${message}</p>`; logEl.scrollTop = logEl.scrollHeight; }
+        async function runWhileDemo() {
+            logEl.innerHTML = '';
+            const seuil = parseInt(inputEl.value);
+            if (isNaN(seuil) || seuil < 10 || seuil > 500) {
+                logMessage("Erreur : Entrez un seuil entre 10 et 500.", 'fail'); return;
+            }
+            logMessage(`Simulation. Seuil à atteindre = ${seuil}`, 'info'); await delay(500);
+            let valeurLue = 0;
+            logMessage(`Initialisation : valeurLue = ${valeurLue};`); await delay(800);
+            while(valeurLue < seuil) {
+                logMessage(`Test : (valeurLue < ${seuil}) ? (${valeurLue} < ${seuil}) -> VRAI.`, 'success'); await delay(600);
+                logMessage(`   Exécution du code...`); await delay(400);
+                valeurLue += 10;
+                logMessage(`   Nouvelle valeurLue = ${valeurLue}`, 'iter'); await delay(800);
+            }
+            logMessage(`Test : (valeurLue < ${seuil}) ? (${valeurLue} < ${seuil}) -> FAUX.`, 'fail'); await delay(800);
+            logMessage(`Fin de la boucle.`, 'info');
+        }
+        const correctAnswers = {
+            1: { val: 'B', correct: 'Correct ! La boucle s\'exécute pour x=0, x=1 et x=2, soit 3 fois.', wrong: 'Incorrect. La condition x < 3 est vraie pour 0, 1 et 2.' },
+            2: { val: 'A', correct: 'Correct ! "val + 1" calcule une valeur mais ne la stocke pas. "val" reste toujours à 10. Il aurait fallu écrire "val--" ou "val = val - 1".', wrong: 'Incorrect. La ligne "val + 1;" ne modifie pas la variable "val", donc elle reste toujours supérieure à 0.' }
+        };
+        function checkQuiz(quizNum, answer) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${quizNum}`);
+            document.querySelectorAll(`#quiz-options-${quizNum} button`).forEach(b => b.disabled = true);
+            const isCorrect = (answer === correctAnswers[quizNum].val);
+            const data = correctAnswers[quizNum];
+            feedbackEl.textContent = isCorrect ? data.correct : data.wrong;
+            feedbackEl.style.color = isCorrect ? '#22C55E' : '#F87171';
+        }
+    </script>
+</body>
+</html>

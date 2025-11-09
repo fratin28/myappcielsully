@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon Interactive | Boucle 'for' Arduino</title>
+    
+    <!-- Lien vers la feuille de style principale du site -->
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <!-- Styles spécifiques à CETTE page (identiques au modèle 'if') -->
+    <style>
+        .lesson-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            text-align: left;
+        }
+        .tabs-nav {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .tab-button {
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover { background-color: rgba(255, 255, 255, 0.05); }
+        .tab-button.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        pre {
+            background-color: #1E293B;
+            color: #E2E8F0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Source Code Pro', monospace;
+            border: 1px solid var(--border-color);
+            margin: 1rem 0;
+        }
+        code {
+            font-family: 'Source Code Pro', monospace;
+            color: var(--accent-blue);
+            background-color: rgba(0, 191, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        h3 { font-size: 1.5rem; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text-heading); }
+        h4 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-light); }
+        p, ul { margin-bottom: 1rem; }
+        ul { list-style-position: inside; }
+        .interactive-demo { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+        .lesson-input { background-color: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-light); padding: 0.5rem; border-radius: 5px; width: 80px; }
+        .lesson-button { background-color: var(--accent-blue); color: var(--bg-dark); border: none; padding: 0.6rem 1.2rem; border-radius: 5px; cursor: pointer; font-weight: bold; transition: transform 0.2s ease; }
+        .lesson-button:hover { transform: scale(1.05); }
+        #for-log { background-color: #0F172A; color: #94A3B8; font-family: 'Source Code Pro', monospace; padding: 1rem; border-radius: 0.5rem; height: 250px; overflow-y: auto; border: 1px solid #334155; }
+        #for-log p { margin: 0; padding: 2px 0; }
+        #for-log p.success { color: #22C55E; }
+        #for-log p.fail { color: #F87171; }
+        #for-log p.info { color: #38BDF8; }
+        #for-log p.iter { color: #FDE047; font-weight: bold; }
+        .exercise-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        .exercise-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+        .exercise-box { background-color: rgba(0,0,0,0.15); padding: 1.5rem; border-radius: 8px; }
+        .quiz-option { display: block; width: 100%; text-align: left; padding: 0.8rem; margin-top: 0.5rem; background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-light); cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease; }
+        .quiz-option:hover:not(:disabled) { background-color: #3e4263; }
+        .quiz-option:disabled { opacity: 0.7; cursor: not-allowed; }
+        .quiz-feedback { margin-top: 1rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Leçon : La boucle <code>for</code> Arduino</h1>
+        <p><a href="../programmation.html" class="back-link">&larr; Retour aux applications de programmation</a></p>
+    </header>
+
+    <main class="container">
+        <div class="lesson-container">
+            
+            <div class="tabs-nav">
+                <button class="tab-button active" onclick="openTab(event, 'definition')">1. Définition & Syntaxe</button>
+                <button class="tab-button" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
+                <button class="tab-button" onclick="openTab(event, 'pieges')">3. Pièges & Erreurs</button>
+                <button class="tab-button" onclick="openTab(event, 'exercices')">4. Exercices</button>
+            </div>
+
+            <div id="tab-content">
+                
+                <div id="definition" class="tab-panel">
+                    <h3>Qu'est-ce qu'une Boucle <code>for</code> ?</h3>
+                    <p>La boucle <code>for</code> ("Pour") est une structure de contrôle qui permet de <strong>répéter un bloc de code un nombre de fois précis</strong>.</p>
+                    <p>Elle est idéale lorsque vous savez à l'avance combien de fois vous voulez exécuter une action (par exemple, "faire clignoter une LED 5 fois").</p>
+                    
+                    <h4>La syntaxe décortiquée</h4>
+                    <p>La boucle <code>for</code> est composée de trois parties entre parenthèses, séparées par des points-virgules :</p>
+                    <pre><code>for (initialisation; condition; incrémentation) {
+  // ... code à répéter ...
+}</code></pre>
+                    <ul>
+                        <li><strong>Initialisation :</strong> Exécutée <strong>une seule fois</strong> au tout début. On y crée généralement une variable qui servira de compteur (ex: <code>int i = 0</code>).</li>
+                        <li><strong>Condition :</strong> Évaluée <strong>avant chaque tour</strong> de boucle. Si elle est vraie, le tour de boucle s'exécute. Si elle est fausse, la boucle s'arrête.</li>
+                        <li><strong>Incrémentation :</strong> Exécutée <strong>à la fin de chaque tour</strong> de boucle. Elle sert le plus souvent à mettre à jour le compteur (ex: <code>i++</code> pour ajouter 1 à <code>i</code>).</li>
+                    </ul>
+
+                    <h4>Exemple 1 : Compter de 0 à 3</h4>
+                    <pre><code>// Fait 4 tours de boucle (pour i = 0, 1, 2, 3)
+for (int i = 0; i < 4; i++) {
+  Serial.print("Le compteur i vaut : ");
+  Serial.println(i);
+}</code></pre>
+
+                    <h4>Exemple 2 : Faire un décompte</h4>
+                    <p>On peut aussi décrémenter (<code>i--</code>) au lieu d'incrémenter.</p>
+                    <pre><code>// Compte à rebours de 3 à 1
+for (int i = 3; i > 0; i--) {
+  Serial.println(i);
+  delay(1000); // Attend 1 seconde
+}
+Serial.println("Décollage !");</code></pre>
+                </div>
+
+                <div id="demo" class="tab-panel" style="display:none;">
+                    <h3>Testez la logique <code>for</code> !</h3>
+                    <p>Entrez le nombre de répétitions et observez le déroulement de la boucle.</p>
+                    <pre><code>for (int i = 0; i < [Votre Nombre]; i++) {
+  Serial.println(i);
+}</code></pre>
+                    <div class="interactive-demo">
+                         <label for="loop-input">Répéter :</label>
+                         <input type="number" id="loop-input" class="lesson-input" value="3" placeholder="ex: 5">
+                         <label for="loop-input">fois</label>
+                         <button id="demo-button" onclick="runForDemo()" class="lesson-button">Lancer</button>
+                    </div>
+                    <h4>Log d'exécution :</h4>
+                    <div id="for-log"><p>Entrez un nombre et cliquez sur 'Lancer'...</p></div>
+                </div>
+                
+                <div id="pieges" class="tab-panel" style="display:none;">
+                    <h3>Piège 1 : Le point-virgule parasite</h3>
+                    <p>Comme pour le <code>if</code>, un point-virgule (<code>;</code>) après la parenthèse termine l'instruction. La boucle va "tourner dans le vide" et le bloc d'accolades qui suit ne sera exécuté qu'une seule fois, après la fin de la boucle.</p>
+                    <pre><code>// ERREUR : Le ; termine le for
+for (int i = 0; i < 5; i++); 
+{
+  // Ce bloc n'est plus dans la boucle !
+  // Il s'exécutera une seule fois, quand i vaudra 5.
+  Serial.println(i); // Affichera "5" une seule fois.
+}</code></pre>
+
+                    <h3>Piège 2 : L'erreur "off-by-one" (décalage d'un)</h3>
+                    <p>C'est l'erreur la plus commune avec les boucles. Attention à votre condition d'arrêt !</p>
+                    <ul>
+                        <li><code>i < 5</code> : Boucle pour i = 0, 1, 2, 3, 4. (<strong>5 itérations</strong>)</li>
+                        <li><code>i <= 5</code> : Boucle pour i = 0, 1, 2, 3, 4, 5. (<strong>6 itérations</strong>)</li>
+                    </ul>
+                    <pre><code>// On veut 10 répétitions.
+// Ce code en fait 11 ! (de 0 à 10 inclus)
+for (int i = 0; i <= 10; i++) {
+  // ...
+}
+// Le bon code est : for (int i = 0; i < 10; i++)</code></pre>
+
+                    <h3>Piège 3 : Modifier le compteur dans la boucle</h3>
+                    <p>Il est fortement déconseillé de modifier la variable du compteur (ici, <code>i</code>) à l'intérieur du bloc d'accolades. Cela peut entraîner des boucles infinies ou un comportement totalement imprévisible.</p>
+                    <pre><code>// BOUCLE INFINIE !
+for (int i = 0; i < 10; i++) {
+  Serial.println(i);
+  i = 0; // i est remis à 0 à chaque tour, il n'atteindra jamais 10 !
+}</code></pre>
+                </div>
+
+                <div id="exercices" class="tab-panel" style="display:none;">
+                    <h3>Testez vos connaissances !</h3>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 1 : Nombre d'itérations</h4>
+                            <p>Combien de fois le mot "Bonjour" sera-t-il affiché ?</p>
+                            <pre><code>for (int i = 0; i < 5; i++) {
+  Serial.println("Bonjour");
+}</code></pre>
+                            <div id="quiz-options-1">
+                                <button class="quiz-option" onclick="checkQuiz(1, 'A')">A) 4 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'B')">B) 5 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'C')">C) 6 fois</button>
+                            </div><div id="quiz-feedback-1" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 2 : L'erreur "off-by-one"</h4>
+                            <p>Combien de fois le mot "Test" sera-t-il affiché ?</p>
+                            <pre><code>for (int k = 1; k <= 3; k++) {
+  Serial.println("Test");
+}</code></pre>
+                            <div id="quiz-options-2">
+                                <button class="quiz-option" onclick="checkQuiz(2, 'A')">A) 2 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'B')">B) 3 fois</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'C')">C) 4 fois</button>
+                            </div><div id="quiz-feedback-2" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 3 : Le point-virgule parasite</h4>
+                            <p>Qu'affichera ce code ? (Attention au piège !)</p>
+                            <pre><code>int i;
+for (i = 0; i < 10; i++);
+{
+  Serial.println(i);
+}</code></pre>
+                            <div id="quiz-options-3">
+                                <button class="quiz-option" onclick="checkQuiz(3, 'A')">A) Les chiffres de 0 à 9</button>
+                                <button class="quiz-option" onclick="checkQuiz(3, 'B')">B) Rien du tout</button>
+                                <button class="quiz-option" onclick="checkQuiz(3, 'C')">C) Uniquement le chiffre 10</button>
+                            </div><div id="quiz-feedback-3" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 4 : Décompte</h4>
+                            <p>Quelle sera la dernière valeur affichée par ce code ?</p>
+                            <pre><code>for (int count = 5; count > 0; count--) {
+  Serial.println(count);
+}</code></pre>
+                            <div id="quiz-options-4">
+                                <button class="quiz-option" onclick="checkQuiz(4, 'A')">A) 5</button>
+                                <button class="quiz-option" onclick="checkQuiz(4, 'B')">B) 1</button>
+                                <button class="quiz-option" onclick="checkQuiz(4, 'C')">C) 0</button>
+                            </div><div id="quiz-feedback-4" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - Profs CIEL / Lycée des métiers SULLY</p>
+    </footer>
+
+    <script>
+        function openTab(event, tabName) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        const logEl = document.getElementById('for-log');
+        const inputEl = document.getElementById('loop-input');
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        function logMessage(message, type = '') { 
+            logEl.innerHTML += `<p class="${type}">${message}</p>`; 
+            logEl.scrollTop = logEl.scrollHeight; 
+        }
+
+        async function runForDemo() {
+            logEl.innerHTML = '';
+            const count = parseInt(inputEl.value);
+
+            if (isNaN(count) || count < 0 || count > 100) {
+                logMessage("Erreur : Entrez un nombre entre 0 et 100.", 'fail');
+                return;
+            }
+
+            logMessage(`Simulation pour une boucle de 0 à ${count-1}.`, 'info'); 
+            await delay(500);
+
+            logMessage(`Initialisation : int i = 0;`);
+            let i = 0;
+            await delay(800);
+
+            if (count === 0) {
+                logMessage(`Test : (i < ${count}) ? (${i} < ${count}) -> FAUX.`, 'fail');
+                await delay(800);
+            }
+
+            for (i = 0; i < count; i++) {
+                logMessage(`--- Itération (i = ${i}) ---`, 'iter');
+                await delay(600);
+                logMessage(`Test : (i < ${count}) ? (${i} < ${count}) -> VRAI.`, 'success');
+                await delay(600);
+                logMessage(`   Exécution du code : Serial.println(${i});`);
+                await delay(600);
+                logMessage(`Incrémentation : i++ (i vaudra ${i + 1})`);
+                await delay(800);
+            }
+            
+            if (count > 0) {
+                 logMessage(`--- Test final (i = ${i}) ---`, 'iter');
+                 await delay(600);
+                 logMessage(`Test : (i < ${count}) ? (${i} < ${count}) -> FAUX.`, 'fail');
+                 await delay(800);
+            }
+           
+            logMessage(`Fin de la boucle.`, 'info');
+        }
+
+        const correctAnswers = {
+            1: { val: 'B', correct: 'Correct ! La boucle s\'exécute pour i = 0, 1, 2, 3, et 4, soit 5 fois.', wrong: 'Incorrect. La condition "i < 5" inclut les valeurs de 0 à 4.' },
+            2: { val: 'B', correct: 'Correct ! La condition est "k <= 3", la boucle tourne pour k = 1, 2 et 3. Soit 3 fois.', wrong: 'Incorrect. Comme la condition inclut l\'égalité (<=), la valeur 3 est incluse dans les tours de boucle.' },
+            3: { val: 'C', correct: 'Correct ! C\'est le piège. Le point-virgule exécute la boucle "à vide" 10 fois. À la fin, i vaut 10. Le "println" s\'exécute ensuite une seule fois et affiche cette valeur finale.', wrong: 'Incorrect. Le point-virgule après le "for" le sépare du bloc d\'accolades. La boucle tourne à vide jusqu\'à ce que i vaille 10.' },
+            4: { val: 'B', correct: 'Correct ! La boucle continue tant que "count > 0". Le dernier tour se fait avec count = 1. Ensuite count devient 0, la condition est fausse et la boucle s\'arrête.', wrong: 'Incorrect. La condition "count > 0" est fausse quand count atteint la valeur 0, donc le tour de boucle pour 0 ne se fait pas.' }
+        };
+
+        function checkQuiz(quizNum, answer) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${quizNum}`);
+            document.querySelectorAll(`#quiz-options-${quizNum} button`).forEach(b => b.disabled = true);
+            
+            const isCorrect = (answer === correctAnswers[quizNum].val);
+            const data = correctAnswers[quizNum];
+            
+            feedbackEl.textContent = isCorrect ? data.correct : data.wrong;
+            feedbackEl.style.color = isCorrect ? '#22C55E' : '#F87171';
+        }
+    </script>
+</body>
+</html>

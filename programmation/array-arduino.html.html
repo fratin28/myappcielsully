@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon Interactive | Les Tableaux (Array) Arduino</title>
+    
+    <!-- Lien vers la feuille de style principale du site -->
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <!-- Styles spécifiques à CETTE page -->
+    <style>
+        .lesson-container { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem 2rem; text-align: left; }
+        .tabs-nav { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .tab-button { padding: 0.8rem 1.2rem; cursor: pointer; background: none; border: none; color: var(--text-light); font-size: 1rem; font-weight: 500; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
+        .tab-button:hover { background-color: rgba(255, 255, 255, 0.05); }
+        .tab-button.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        pre { background-color: #1E293B; color: #E2E8F0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace; border: 1px solid var(--border-color); margin: 1rem 0; }
+        code { font-family: 'Source Code Pro', monospace; color: var(--accent-blue); background-color: rgba(0, 191, 255, 0.1); padding: 2px 5px; border-radius: 4px; }
+        h3 { font-size: 1.5rem; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text-heading); }
+        h4 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-light); }
+        p, ul { margin-bottom: 1rem; }
+        ul { list-style-position: inside; }
+        .interactive-demo { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+        .lesson-input { background-color: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-light); padding: 0.5rem; border-radius: 5px; width: 80px; }
+        .lesson-button { background-color: var(--accent-blue); color: var(--bg-dark); border: none; padding: 0.6rem 1.2rem; border-radius: 5px; cursor: pointer; font-weight: bold; transition: transform 0.2s ease; }
+        .lesson-button:hover { transform: scale(1.05); }
+        #array-log { background-color: #0F172A; color: #94A3B8; font-family: 'Source Code Pro', monospace; padding: 1rem; border-radius: 0.5rem; height: 250px; overflow-y: auto; border: 1px solid #334155; }
+        #array-log p { margin: 0; padding: 2px 0; }
+        #array-log p.fail { color: #F87171; }
+        #array-log p.info { color: #38BDF8; }
+        #array-log p.result { color: #FDE047; font-weight: bold; }
+        .exercise-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        .exercise-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+        .exercise-box { background-color: rgba(0,0,0,0.15); padding: 1.5rem; border-radius: 8px; }
+        .quiz-option { display: block; width: 100%; text-align: left; padding: 0.8rem; margin-top: 0.5rem; background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-light); cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease; }
+        .quiz-option:hover:not(:disabled) { background-color: #3e4263; }
+        .quiz-option:disabled { opacity: 0.7; cursor: not-allowed; }
+        .quiz-feedback { margin-top: 1rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Leçon : Les Tableaux (<code>Array</code>)</h1>
+        <p><a href="../programmation.html" class="back-link">&larr; Retour aux applications de programmation</a></p>
+    </header>
+
+    <main class="container">
+        <div class="lesson-container">
+            
+            <div class="tabs-nav">
+                <button class="tab-button active" onclick="openTab(event, 'definition')">1. Définition & Syntaxe</button>
+                <button class="tab-button" onclick="openTab(event, 'demo')">2. Démo Interactive</button>
+                <button class="tab-button" onclick="openTab(event, 'pieges')">3. Pièges & Erreurs</button>
+                <button class="tab-button" onclick="openTab(event, 'exercices')">4. Exercices</button>
+            </div>
+
+            <div id="tab-content">
+                
+                <div id="definition" class="tab-panel">
+                    <h3>Qu'est-ce qu'un Tableau (Array) ?</h3>
+                    <p>Un tableau est une structure qui permet de stocker une collection de plusieurs valeurs <strong>du même type</strong> dans une seule variable. Imaginez une boîte de rangement avec des compartiments numérotés.</p>
+                    <p>Chaque élément du tableau est accessible via un <strong>index</strong> (sa position), qui commence <strong>toujours à 0</strong>.</p>
+                    
+                    <h4>Déclaration et Initialisation</h4>
+                    <p>Vous pouvez déclarer un tableau et le remplir en même temps. La taille est alors calculée automatiquement.</p>
+                    <pre><code>// Un tableau d'entiers (int) nommé 'pins'
+// Index :   0  1  2  3
+int pins[] = {2, 4, 7, 8};</code></pre>
+
+                    <h4>Accéder à un élément</h4>
+                    <p>On utilise le nom du tableau suivi de l'index entre crochets <code>[ ]</code>.</p>
+                    <pre><code>int premierePin = pins[0]; // Vaut 2
+int troisiemePin = pins[2]; // Vaut 7
+
+// On peut aussi l'utiliser directement :
+digitalWrite(pins[3], HIGH); // Met la pin 8 à HIGH</code></pre>
+                    
+                    <h4>Parcourir un tableau avec une boucle <code>for</code></h4>
+                    <p>Les tableaux et les boucles <code>for</code> sont faits pour travailler ensemble. C'est la méthode la plus courante pour manipuler tous les éléments d'un tableau.</p>
+                    <pre><code>// Allumer toutes les LEDs connectées aux pins du tableau
+for (int i = 0; i < 4; i++) {
+  // Au premier tour, i=0, on utilise pins[0]
+  // Au second tour, i=1, on utilise pins[1]... etc.
+  pinMode(pins[i], OUTPUT);
+  digitalWrite(pins[i], HIGH);
+}</code></pre>
+                </div>
+
+                <div id="demo" class="tab-panel" style="display:none;">
+                    <h3>Visualisez l'accès au tableau !</h3>
+                    <p>Le tableau suivant est défini dans le code. Entrez un index pour lire la valeur qui s'y trouve.</p>
+                    <pre><code>int notes[] = {12, 17, 8, 14, 11};</code></pre>
+                    <div class="interactive-demo">
+                         <label for="index-input">Lire la valeur à l'index :</label>
+                         <input type="number" id="index-input" class="lesson-input" placeholder="ex: 2">
+                         <button id="demo-button" onclick="runArrayDemo()" class="lesson-button">Lire</button>
+                    </div>
+                    <h4>Log d'exécution :</h4>
+                    <div id="array-log"><p>Entrez un index entre 0 et 4 et cliquez sur 'Lire'...</p></div>
+                </div>
+                
+                <div id="pieges" class="tab-panel" style="display:none;">
+                    <h3>Piège 1 : L'index commence à 0 !</h3>
+                    <p>C'est la source d'erreur la plus fréquente. Le premier élément est à l'index <code>[0]</code>, le deuxième à l'index <code>[1]</code>, etc.</p>
+                    <pre><code>int monTableau[3] = {10, 20, 30};
+// Le premier élément est monTableau[0]  (vaut 10)
+// Le dernier élément est monTableau[2] (vaut 30)</code></pre>
+
+                    <h3>Piège 2 : L'accès "hors limites" (Out of Bounds)</h3>
+                    <p>Si un tableau a une taille de 5, ses index valides sont 0, 1, 2, 3, 4. Essayer de lire ou d'écrire à <code>monTableau[5]</code> est une grave erreur. Arduino ne vous préviendra pas, mais cela corrompra la mémoire et créera des bugs très difficiles à trouver.</p>
+                    <pre><code>int monTableau[3] = {10, 20, 30};
+// ERREUR ! L'index 3 n'existe pas.
+// Comportement imprévisible du programme !
+int valeur = monTableau[3]; </code></pre>
+                    
+                    <h3>Piège 3 : Comment connaître la taille d'un tableau ?</h3>
+                    <p>En C++, il n'y a pas de fonction simple comme <code>tableau.length</code>. On utilise une astuce avec l'opérateur <code>sizeof()</code> qui retourne la taille en octets.</p>
+                    <pre><code>int notes[] = {12, 17, 8, 14, 11};
+// sizeof(notes) -> 5 * 2 = 10 (un int occupe 2 octets)
+// sizeof(notes[0]) -> 2 (la taille d'un seul int)
+int taille = sizeof(notes) / sizeof(notes[0]); // 10 / 2 = 5
+// 'taille' vaut maintenant 5, on peut l'utiliser dans une boucle !
+for (int i = 0; i < taille; i++) { ... }</code></pre>
+                </div>
+
+                <div id="exercices" class="tab-panel" style="display:none;">
+                    <h3>Testez vos connaissances !</h3>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 1 : Accès direct</h4>
+                            <p>Quelle valeur contient la variable `resultat` à la fin de ce code ?</p>
+                            <pre><code>int data[] = {50, 100, 150, 200};
+int resultat = data[2];</code></pre>
+                            <div id="quiz-options-1">
+                                <button class="quiz-option" onclick="checkQuiz(1, 'A')">A) 100</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'B')">B) 150</button>
+                                <button class="quiz-option" onclick="checkQuiz(1, 'C')">C) 200</button>
+                            </div><div id="quiz-feedback-1" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 2 : Les limites</h4>
+                            <p>Si on déclare `float mesures[10];`, quel est le dernier index valide ?</p>
+                            <pre><code>float mesures[10];</code></pre>
+                            <div id="quiz-options-2">
+                                <button class="quiz-option" onclick="checkQuiz(2, 'A')">A) 10</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'B')">B) 9</button>
+                                <button class="quiz-option" onclick="checkQuiz(2, 'C')">C) 11</button>
+                            </div><div id="quiz-feedback-2" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                    <section class="exercise-section">
+                        <div class="exercise-box">
+                            <h4>Exercice 3 : Boucle et tableau</h4>
+                            <p>Qu'affichera ce code ?</p>
+                            <pre><code>int arr[] = {1, 2, 3};
+for (int i = 0; i < 3; i++) {
+  Serial.print(arr[i] + 1);
+}</code></pre>
+                            <div id="quiz-options-3">
+                                <button class="quiz-option" onclick="checkQuiz(3, 'A')">A) 123</button>
+                                <button class="quiz-option" onclick="checkQuiz(3, 'B')">B) 234</button>
+                                <button class="quiz-option" onclick="checkQuiz(3, 'C')">C) 1, 2, 3</button>
+                            </div><div id="quiz-feedback-3" class="quiz-feedback"></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - Profs CIEL / Lycée des métiers SULLY</p>
+    </footer>
+
+    <script>
+        function openTab(event, tabName) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+        
+        const logEl = document.getElementById('array-log');
+        const inputEl = document.getElementById('index-input');
+        const demoArray = [12, 17, 8, 14, 11];
+
+        function logMessage(message, type = '') { 
+            logEl.innerHTML += `<p class="${type}">${message}</p>`; 
+            logEl.scrollTop = logEl.scrollHeight; 
+        }
+
+        function runArrayDemo() {
+            logEl.innerHTML = '';
+            const index = parseInt(inputEl.value);
+
+            logMessage(`Tableau : [${demoArray.join(', ')}]`, 'info');
+            
+            if (isNaN(index)) {
+                logMessage("Erreur : Entrez un index numérique.", 'fail');
+                return;
+            }
+
+            logMessage(`Tentative de lecture à l'index [${index}]...`);
+            
+            if (index >= 0 && index < demoArray.length) {
+                const value = demoArray[index];
+                logMessage(`   -> Index valide.`, 'success');
+                logMessage(`   -> La valeur est : ${value}`, 'result');
+            } else {
+                logMessage(`   -> ERREUR : Index hors limites !`, 'fail');
+                logMessage(`Les index valides pour ce tableau sont de 0 à ${demoArray.length - 1}.`, 'fail');
+            }
+        }
+
+        const correctAnswers = {
+            1: { val: 'B', correct: 'Correct ! data[0] est 50, data[1] est 100, et data[2] est 150.', wrong: 'Incorrect. N\'oubliez pas que l\'indexation commence à 0 ! data[2] est le troisième élément.' },
+            2: { val: 'B', correct: 'Correct ! Pour un tableau de taille 10, les index vont de 0 à 9.', wrong: 'Incorrect. Un tableau de taille N a des index qui vont de 0 à N-1.' },
+            3: { val: 'B', correct: 'Correct ! La boucle affiche chaque élément + 1. Donc (1+1)=2, (2+1)=3, (3+1)=4. Le résultat est "234".', wrong: 'Incorrect. L\'instruction "Serial.print(arr[i] + 1)" ajoute 1 à chaque élément avant de l\'afficher.' }
+        };
+
+        function checkQuiz(quizNum, answer) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${quizNum}`);
+            document.querySelectorAll(`#quiz-options-${quizNum} button`).forEach(b => b.disabled = true);
+            const isCorrect = (answer === correctAnswers[quizNum].val);
+            const data = correctAnswers[quizNum];
+            feedbackEl.textContent = isCorrect ? data.correct : data.wrong;
+            feedbackEl.style.color = isCorrect ? '#22C55E' : '#F87171';
+        }
+    </script>
+</body>
+</html>
