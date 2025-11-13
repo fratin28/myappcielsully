@@ -35,7 +35,7 @@
       "lien": "programmation.html",
       "icone": "https://img.icons8.com/fluency/96/code.png"
     },
-	{
+    {
       "id": "bonus",
       "titre": "Bonus",
       "description": "Une page bonus pour se détendre !",
@@ -44,7 +44,7 @@
     }
   ],
   "applications": [
-  	{
+    {
       "categorie": "electronique",
       "titre": "Simulateur du déplacement des électrons dans un fil",
       "description": "Apréhender la loi d'Ohm en manipulant la tension et la résistance.",
@@ -63,10 +63,22 @@
       "lien": "electronique/code-couleurs-resistances.html"
     },
     {
+      "categorie": "electronique",
+      "titre": "Oscilloscope Virtuel (Signaux Carrés/Sinus)",
+      "description": "Mesurez période, fréquence et tension de signaux sur un oscilloscope interactif.",
+      "lien": "electronique/signaux-sinu-carre.html"
+    },
+    {
       "categorie": "reseau",
       "titre": "Calculateur de Sous-réseaux",
       "description": "Calculez rapidement les masques, adresses de réseau et de broadcast.",
       "lien": "reseau/calculateur-subnets.html"
+    },
+    {
+      "categorie": "systeme",
+      "titre": "Assemblage d'un PC",
+      "description": "Un outil pour apprendre l'assemblage d'un PC fix.",
+      "lien": "systeme/assemblage.html"
     },
     {
       "categorie": "systeme",
@@ -86,7 +98,7 @@
       "description": "Apprenez à utiliser l'instruction conditionnelle 'if' avec une démo et des exercices.",
       "lien": "programmation/if-arduino.html"
     },
-	{
+    {
       "categorie": "programmation",
       "titre": "Leçon Interactive : La boucle 'for'",
       "description": "Maîtrisez les répétitions à nombre d'itérations connu avec la boucle 'for'.",
@@ -98,13 +110,13 @@
       "description": "Apprenez à stocker et manipuler des collections de données dans des tableaux.",
       "lien": "programmation/array-arduino.html"
     },
-	{
+    {
       "categorie": "programmation",
       "titre": "Leçon Interactive : La boucle 'while'",
       "description": "Découvrez comment répéter une action tant qu'une condition est vraie.",
       "lien": "programmation/while-arduino.html"
     },
-	{
+    {
       "categorie": "programmation",
       "titre": "Leçon Interactive : La boucle 'do...while'",
       "description": "Apprenez à utiliser la boucle qui s'exécute toujours au moins une fois.",
