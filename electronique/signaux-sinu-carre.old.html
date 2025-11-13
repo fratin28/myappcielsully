@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Oscilloscope de TP Virtuel (Affichage Épuré)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #f0f4f8; }
+        #app-container { max-width: 1200px; width: 100%; }
+        #main-content { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; }
+        #oscillo-container { flex: 3; min-width: 600px; }
+        #controls-container { flex: 1; min-width: 300px; }
+        canvas { background-color: #1a1a3a; border: 3px solid #333; width: 100%; height: auto; }
+        .panel { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2 { color: #003366; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-top: 0; }
+        .control-group { margin: 15px 0; }
+        label { font-weight: bold; color: #555; }
+        select, input[type="range"], input[type="number"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .value-display { font-style: italic; color: #0056b3; }
+        button { width: 100%; padding: 12px; font-size: 16px; cursor: pointer; border: none; background-color: #007bff; color: white; border-radius: 5px; margin-top: 10px; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+        #feedback { margin-top: 15px; font-weight: bold; text-align: center; padding: 10px; border-radius: 5px; }
+        #correction-details { margin-top: 20px; padding: 15px; background-color: #fffbe6; border: 1px solid #ffe58f; border-radius: 5px; }
+        .correct { background-color: #d4edda; color: #155724; }
+        .incorrect { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="main-content">
+        <div id="oscillo-container" class="panel">
+            <canvas id="oscilloscope" width="800" height="480"></canvas>
+        </div>
+        <div id="controls-container" class="panel">
+            <h2>Mode Exploration</h2>
+            <p>Ajustez les paramètres pour voir leur effet.</p>
+            <div class="control-group">
+                <label for="waveform">Forme du Signal</label>
+                <select id="waveform">
+                    <option value="sine" selected>Sinusoïdal</option>
+                    <option value="square">Carré (Rectangulaire)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="frequency">Fréquence : <span id="freq-val" class="value-display">50</span> Hz</label>
+                <input type="range" id="frequency" min="10" max="500" value="50" step="1">
+            </div>
+            <div class="control-group">
+                <label for="voltage">Tension Max (Umax) : <span id="volt-val" class="value-display">5</span> V</label>
+                <input type="range" id="voltage" min="1" max="20" value="5" step="0.5">
+            </div>
+            <hr>
+            <div class="control-group">
+                <label for="timeBase">Base de Temps</label>
+                <select id="timeBase">
+                    <option value="0.001">1 ms/div</option><option value="0.002">2 ms/div</option><option value="0.005" selected>5 ms/div</option><option value="0.01">10 ms/div</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="sensitivity">Sensibilité Verticale</label>
+                <select id="sensitivity">
+                    <option value="0.5">0.5 V/div</option><option value="1">1 V/div</option><option value="2" selected>2 V/div</option><option value="5">5 V/div</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="exercise-container" class="panel">
+        <h2>Mode Entraînement</h2>
+        <button id="new-exercise">Nouvel Exercice</button>
+        <p>À partir du signal affiché, mesurez puis calculez les valeurs demandées :</p>
+        <div class="control-group"><label for="user-period">Période (T) en ms :</label><input type="number" id="user-period" step="any" placeholder="Mesurez sur l'écran et calculez"></div>
+        <div class="control-group"><label for="user-frequency">Fréquence (f) en Hz :</label><input type="number" id="user-frequency" step="any" placeholder="Calculez à partir de T"></div>
+        <div class="control-group"><label for="user-voltage">Tension Max (Umax) en V :</label><input type="number" id="user-voltage" step="any" placeholder="Mesurez sur l'écran et calculez"></div>
+        <button id="check-answers">Vérifier mes réponses</button>
+        <button id="show-correction" disabled>Voir la correction</button>
+        <div id="feedback"></div>
+        <div id="correction-details" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('oscilloscope');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width, height = canvas.height;
+    const horizDivs = 10, vertDivs = 8;
+    const gridSpacingX = width / horizDivs, gridSpacingY = height / vertDivs;
+    const gridCenterX = width / 2, gridCenterY = height / 2;
+
+    const waveformSelect = document.getElementById('waveform');
+    const frequencySlider = document.getElementById('frequency'), voltageSlider = document.getElementById('voltage');
+    const timeBaseSelect = document.getElementById('timeBase'), sensitivitySelect = document.getElementById('sensitivity');
+    const freqVal = document.getElementById('freq-val'), voltVal = document.getElementById('volt-val');
+    
+    const newExerciseBtn = document.getElementById('new-exercise'), checkAnswersBtn = document.getElementById('check-answers');
+    const showCorrectionBtn = document.getElementById('show-correction');
+    const userPeriodInput = document.getElementById('user-period'), userFrequencyInput = document.getElementById('user-frequency'), userVoltageInput = document.getElementById('user-voltage');
+    const feedbackDiv = document.getElementById('feedback'), correctionDetailsDiv = document.getElementById('correction-details');
+    let exerciseValues = {};
+
+    function drawGrid() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Major grid lines
+        ctx.strokeStyle = '#777'; 
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= horizDivs; i++) { const x = i * gridSpacingX; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
+        for (let i = 0; i <= vertDivs; i++) { const y = i * gridSpacingY; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
+        
+        // Center axes
+        ctx.strokeStyle = '#aaa'; 
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(gridCenterX, 0); ctx.lineTo(gridCenterX, height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, gridCenterY); ctx.lineTo(width, gridCenterY); ctx.stroke();
+
+        // *** NEW: Add tick marks on the central axes ***
+        const subDivs = 5;
+        const tickLength = 8;
+        ctx.strokeStyle = '#aaa'; // Use the bright color for ticks
+        ctx.lineWidth = 1;
+
+        // Ticks for the horizontal axis
+        for (let i = 1; i < horizDivs * subDivs; i++) {
+            if (i % subDivs !== 0) { // Don't draw where a major line already is
+                const x = i * gridSpacingX / subDivs;
+                ctx.beginPath();
+                ctx.moveTo(x, gridCenterY - tickLength / 2);
+                ctx.lineTo(x, gridCenterY + tickLength / 2);
+                ctx.stroke();
+            }
+        }
+        // Ticks for the vertical axis
+        for (let i = 1; i < vertDivs * subDivs; i++) {
+            if (i % subDivs !== 0) {
+                const y = i * gridSpacingY / subDivs;
+                ctx.beginPath();
+                ctx.moveTo(gridCenterX - tickLength / 2, y);
+                ctx.lineTo(gridCenterX + tickLength / 2, y);
+                ctx.stroke();
+            }
+        }
+    }
+
+    function drawSignal() {
+        drawGrid();
+        const waveform = waveformSelect.value;
+        const frequency = parseFloat(frequencySlider.value), amplitude = parseFloat(voltageSlider.value);
+        const timeBase = parseFloat(timeBaseSelect.value), sensitivity = parseFloat(sensitivitySelect.value);
+        const pixelsPerVolt = gridSpacingY / sensitivity, timePerPixel = timeBase / gridSpacingX;
+        
+        ctx.strokeStyle = '#76ff76'; ctx.lineWidth = 2.5; ctx.beginPath();
+        
+        for (let x_pixel = 0; x_pixel < width; x_pixel++) {
+            const time = (x_pixel - gridCenterX) * timePerPixel;
+            let voltage = 0;
+
+            switch (waveform) {
+                case 'sine':
+                    voltage = amplitude * Math.sin(2 * Math.PI * frequency * time);
+                    break;
+                case 'square':
+                    voltage = Math.sin(2 * Math.PI * frequency * time) >= 0 ? amplitude : -amplitude;
+                    break;
+            }
+            
+            const y_pixel = gridCenterY - voltage * pixelsPerVolt;
+            (x_pixel === 0) ? ctx.moveTo(x_pixel, y_pixel) : ctx.lineTo(x_pixel, y_pixel);
+        }
+        ctx.stroke();
+    }
+    
+    function updateExplorationDisplay() {
+        freqVal.textContent = frequencySlider.value; voltVal.textContent = voltageSlider.value;
+    }
+
+    function setupNewExercise() {
+        const waveforms = ['sine', 'square'];
+        const chosenWaveform = waveforms[Math.floor(Math.random() * waveforms.length)];
+        waveformSelect.value = chosenWaveform;
+
+        const timeBaseOptions = Array.from(timeBaseSelect.options).map(o => parseFloat(o.value));
+        const sensitivityOptions = Array.from(sensitivitySelect.options).map(o => parseFloat(o.value));
+        const niceHorizDivs = [2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+        const niceVertDivs = [1.5, 2.0, 2.5, 3.0, 3.5];
+        
+        const chosenTimeBase = timeBaseOptions[Math.floor(Math.random() * timeBaseOptions.length)];
+        const chosenSensitivity = sensitivityOptions[Math.floor(Math.random() * sensitivityOptions.length)];
+        const chosenHorizDivs = niceHorizDivs[Math.floor(Math.random() * niceHorizDivs.length)];
+        const chosenVertDivs = niceVertDivs[Math.floor(Math.random() * niceVertDivs.length)];
+
+        const period_s = chosenHorizDivs * chosenTimeBase;
+        const frequency = 1 / period_s;
+        const voltage = chosenVertDivs * chosenSensitivity;
+
+        frequencySlider.value = frequency; voltageSlider.value = voltage;
+        timeBaseSelect.value = chosenTimeBase; sensitivitySelect.value = chosenSensitivity;
+        exerciseValues = { frequency: frequency, voltage: voltage, period: period_s * 1000 };
+        
+        userPeriodInput.value = ''; userFrequencyInput.value = ''; userVoltageInput.value = '';
+        feedbackDiv.textContent = ''; feedbackDiv.className = '';
+        correctionDetailsDiv.style.display = 'none';
+        showCorrectionBtn.disabled = true;
+        
+        freqVal.textContent = '???'; voltVal.textContent = '???';
+        drawSignal();
+    }
+
+    function checkAnswers() {
+        const p_str = userPeriodInput.value.replace(',', '.');
+        const f_str = userFrequencyInput.value.replace(',', '.');
+        const v_str = userVoltageInput.value.replace(',', '.');
+        if (p_str === '' || f_str === '' || v_str === '') {
+            feedbackDiv.textContent = 'Veuillez remplir tous les champs avant de vérifier.';
+            feedbackDiv.className = 'incorrect';
+            return;
+        }
+        const userPeriod = parseFloat(p_str);
+        const userFrequency = parseFloat(f_str);
+        const userVoltage = parseFloat(v_str);
+        const periodCorrect = Math.abs(userPeriod - exerciseValues.period) / exerciseValues.period < 0.03;
+        const freqCorrect = Math.abs(userFrequency - exerciseValues.frequency) / exerciseValues.frequency < 0.03;
+        const voltCorrect = Math.abs(userVoltage - exerciseValues.voltage) / exerciseValues.voltage < 0.03;
+
+        if (periodCorrect && freqCorrect && voltCorrect) {
+            feedbackDiv.textContent = "Excellent ! Toutes vos réponses sont correctes.";
+            feedbackDiv.className = 'correct';
+        } else {
+            feedbackDiv.textContent = "Certaines réponses sont incorrectes. Vérifiez vos mesures et calculs.";
+            feedbackDiv.className = 'incorrect';
+        }
+        showCorrectionBtn.disabled = false;
+    }
+
+    function displayCorrection() {
+        const timeBase = parseFloat(timeBaseSelect.value);
+        const sensitivity = parseFloat(sensitivitySelect.value);
+        const horizDivsForPeriod = exerciseValues.period / 1000 / timeBase;
+        const vertDivsForUmax = exerciseValues.voltage / sensitivity;
+        correctionDetailsDiv.innerHTML = `
+            <h3>Détails de la Correction</h3>
+            <p><strong>1. Période (T) :</strong></p>
+            <ul>
+                <li>Nombre de divisions horizontales pour un motif : <b>${horizDivsForPeriod.toFixed(1)} div</b>.</li>
+                <li>Base de temps : <b>${timeBase * 1000} ms/div</b>.</li>
+                <li><b>Calcul :</b> T = ${horizDivsForPeriod.toFixed(1)} × ${timeBase * 1000} = <strong>${exerciseValues.period.toFixed(1)} ms</strong>.</li>
+            </ul>
+            <p><strong>2. Fréquence (f) :</strong></p>
+            <ul>
+                <li>Formule : <b>f = 1 / T</b> (avec T en secondes).</li>
+                <li><b>Calcul :</b> f = 1 / ${ (exerciseValues.period / 1000).toPrecision(3) } = <strong>${exerciseValues.frequency.toFixed(1)} Hz</strong>.</li>
+            </ul>
+            <p><strong>3. Tension Maximale (Umax) :</strong></p>
+            <ul>
+                <li>Nombre de divisions verticales (du centre au sommet) : <b>${vertDivsForUmax.toFixed(1)} div</b>.</li>
+                <li>Sensibilité verticale : <b>${sensitivity} V/div</b>.</li>
+                <li><b>Calcul :</b> Umax = ${vertDivsForUmax.toFixed(1)} × ${sensitivity} = <strong>${exerciseValues.voltage.toFixed(1)} V</strong>.</li>
+            </ul>
+        `;
+        correctionDetailsDiv.style.display = 'block';
+    }
+
+    [frequencySlider, voltageSlider].forEach(el => el.addEventListener('input', () => { updateExplorationDisplay(); drawSignal(); }));
+    [timeBaseSelect, sensitivitySelect, waveformSelect].forEach(el => el.addEventListener('change', drawSignal));
+    newExerciseBtn.addEventListener('click', setupNewExercise);
+    checkAnswersBtn.addEventListener('click', checkAnswers);
+    showCorrectionBtn.addEventListener('click', displayCorrection);
+
+    updateExplorationDisplay();
+    drawSignal();
+</script>
+
+</body>
+</html>
