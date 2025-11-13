@@ -2,122 +2,27 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oscilloscope de TP Virtuel | Thème CIEL</title>
+    <title>Oscilloscope de TP Virtuel (Affichage Épuré)</title>
     <style>
-        /* --- Thème sombre appliqué --- */
-        :root {
-            --bg-dark: #1a1c2c;
-            --bg-card: #2c2f48;
-            --text-light: #e0e0e0;
-            --text-heading: #ffffff;
-            --accent-blue: #00bfff;
-            --border-color: #4a4e69;
-        }
-
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 20px; 
-            background-color: var(--bg-dark); /* Modifié */
-            color: var(--text-light); /* Modifié */
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #f0f4f8; }
         #app-container { max-width: 1200px; width: 100%; }
         #main-content { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; }
         #oscillo-container { flex: 3; min-width: 600px; }
         #controls-container { flex: 1; min-width: 300px; }
-        
-        canvas { 
-            background-color: #0F172A; /* Fond d'écran légèrement différent */
-            border: 1px solid var(--border-color); /* Modifié */
-            width: 100%; 
-            height: auto; 
-            border-radius: 5px; /* Ajout */
-        }
-        
-        .panel { 
-            background-color: var(--bg-card); /* Modifié */
-            padding: 20px; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); /* Modifié */
-            box-shadow: none; /* Modifié */
-        }
-        
-        h1, h2 { 
-            color: var(--text-heading); /* Modifié */
-            border-bottom: 1px solid var(--border-color); /* Modifié */
-            padding-bottom: 10px; 
-            margin-top: 0; 
-            font-family: 'Source Code Pro', monospace; /* Ajout */
-        }
-        
+        canvas { background-color: #1a1a3a; border: 3px solid #333; width: 100%; height: auto; }
+        .panel { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2 { color: #003366; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-top: 0; }
         .control-group { margin: 15px 0; }
-        
-        label { 
-            font-weight: bold; 
-            color: var(--text-light); /* Modifié */
-        }
-        
-        select, input[type="range"], input[type="number"] { 
-            width: 100%; 
-            padding: 8px; 
-            margin-top: 5px; 
-            box-sizing: border-box; 
-            border: 1px solid var(--border-color); /* Modifié */
-            border-radius: 4px; 
-            background-color: var(--bg-dark); /* Modifié */
-            color: var(--text-light); /* Modifié */
-        }
-        
-        .value-display { 
-            font-style: italic; 
-            color: var(--accent-blue); /* Modifié */
-        }
-        
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            border: none; 
-            background-color: var(--accent-blue); /* Modifié */
-            color: var(--bg-dark); /* Modifié */
-            font-weight: bold; /* Ajout */
-            border-radius: 5px; 
-            margin-top: 10px; 
-            transition: transform 0.2s ease; /* Modifié */
-        }
-        
-        button:hover:not(:disabled) { 
-            transform: scale(1.02); /* Modifié */
-        }
-        
-        button:disabled { 
-            background-color: #4a4e69; /* Modifié */
-            cursor: not-allowed; 
-            opacity: 0.7;
-        }
-        
+        label { font-weight: bold; color: #555; }
+        select, input[type="range"], input[type="number"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .value-display { font-style: italic; color: #0056b3; }
+        button { width: 100%; padding: 12px; font-size: 16px; cursor: pointer; border: none; background-color: #007bff; color: white; border-radius: 5px; margin-top: 10px; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
         #feedback { margin-top: 15px; font-weight: bold; text-align: center; padding: 10px; border-radius: 5px; }
-        
-        #correction-details { 
-            margin-top: 20px; 
-            padding: 15px; 
-            background-color: rgba(0,0,0,0.2); /* Modifié */
-            border: 1px solid var(--border-color); /* Modifié */
-            border-radius: 5px; 
-        }
-        
-        /* Couleurs des feedbacks adaptées au thème sombre */
-        .correct { 
-            background-color: rgba(34, 197, 94, 0.2); 
-            color: #22c55e; 
-        }
-        .incorrect { 
-            background-color: rgba(248, 113, 113, 0.2); 
-            color: #f87171; 
-        }
+        #correction-details { margin-top: 20px; padding: 15px; background-color: #fffbe6; border: 1px solid #ffe58f; border-radius: 5px; }
+        .correct { background-color: #d4edda; color: #155724; }
+        .incorrect { background-color: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
@@ -145,7 +50,7 @@
                 <label for="voltage">Tension Max (Umax) : <span id="volt-val" class="value-display">5</span> V</label>
                 <input type="range" id="voltage" min="1" max="20" value="5" step="0.5">
             </div>
-            <hr style="border-color: var(--border-color); opacity: 0.5;">
+            <hr>
             <div class="control-group">
                 <label for="timeBase">Base de Temps</label>
                 <select id="timeBase">
@@ -196,34 +101,43 @@
 
     function drawGrid() {
         ctx.clearRect(0, 0, width, height);
-        // Lignes de la grille principale
-        ctx.strokeStyle = '#4a4e69'; // Couleur grille sombre
+
+        // Major grid lines
+        ctx.strokeStyle = '#777'; 
         ctx.lineWidth = 1;
         for (let i = 0; i <= horizDivs; i++) { const x = i * gridSpacingX; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
         for (let i = 0; i <= vertDivs; i++) { const y = i * gridSpacingY; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
         
-        // Axes centraux
-        ctx.strokeStyle = '#a0a0a0'; 
-        ctx.lineWidth = 1.5;
+        // Center axes
+        ctx.strokeStyle = '#aaa'; 
+        ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(gridCenterX, 0); ctx.lineTo(gridCenterX, height); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(0, gridCenterY); ctx.lineTo(width, gridCenterY); ctx.stroke();
 
-        // Graduations sur les axes
+        // *** NEW: Add tick marks on the central axes ***
         const subDivs = 5;
         const tickLength = 8;
-        ctx.strokeStyle = '#a0a0a0';
+        ctx.strokeStyle = '#aaa'; // Use the bright color for ticks
         ctx.lineWidth = 1;
 
+        // Ticks for the horizontal axis
         for (let i = 1; i < horizDivs * subDivs; i++) {
-            if (i % subDivs !== 0) {
+            if (i % subDivs !== 0) { // Don't draw where a major line already is
                 const x = i * gridSpacingX / subDivs;
-                ctx.beginPath(); ctx.moveTo(x, gridCenterY - tickLength / 2); ctx.lineTo(x, gridCenterY + tickLength / 2); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, gridCenterY - tickLength / 2);
+                ctx.lineTo(x, gridCenterY + tickLength / 2);
+                ctx.stroke();
             }
         }
+        // Ticks for the vertical axis
         for (let i = 1; i < vertDivs * subDivs; i++) {
             if (i % subDivs !== 0) {
                 const y = i * gridSpacingY / subDivs;
-                ctx.beginPath(); ctx.moveTo(gridCenterX - tickLength / 2, y); ctx.lineTo(gridCenterX + tickLength / 2, y); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(gridCenterX - tickLength / 2, y);
+                ctx.lineTo(gridCenterX + tickLength / 2, y);
+                ctx.stroke();
             }
         }
     }
@@ -235,16 +149,21 @@
         const timeBase = parseFloat(timeBaseSelect.value), sensitivity = parseFloat(sensitivitySelect.value);
         const pixelsPerVolt = gridSpacingY / sensitivity, timePerPixel = timeBase / gridSpacingX;
         
-        ctx.strokeStyle = '#00bfff'; /* Couleur accentuée du signal */
-        ctx.lineWidth = 2.5; ctx.beginPath();
+        ctx.strokeStyle = '#76ff76'; ctx.lineWidth = 2.5; ctx.beginPath();
         
         for (let x_pixel = 0; x_pixel < width; x_pixel++) {
             const time = (x_pixel - gridCenterX) * timePerPixel;
             let voltage = 0;
+
             switch (waveform) {
-                case 'sine': voltage = amplitude * Math.sin(2 * Math.PI * frequency * time); break;
-                case 'square': voltage = Math.sin(2 * Math.PI * frequency * time) >= 0 ? amplitude : -amplitude; break;
+                case 'sine':
+                    voltage = amplitude * Math.sin(2 * Math.PI * frequency * time);
+                    break;
+                case 'square':
+                    voltage = Math.sin(2 * Math.PI * frequency * time) >= 0 ? amplitude : -amplitude;
+                    break;
             }
+            
             const y_pixel = gridCenterY - voltage * pixelsPerVolt;
             (x_pixel === 0) ? ctx.moveTo(x_pixel, y_pixel) : ctx.lineTo(x_pixel, y_pixel);
         }
@@ -319,23 +238,23 @@
         const horizDivsForPeriod = exerciseValues.period / 1000 / timeBase;
         const vertDivsForUmax = exerciseValues.voltage / sensitivity;
         correctionDetailsDiv.innerHTML = `
-            <h3 style="color: var(--text-heading);">Détails de la Correction</h3>
+            <h3>Détails de la Correction</h3>
             <p><strong>1. Période (T) :</strong></p>
             <ul>
-                <li>Nombre de divisions horizontales pour un motif : <b style="color: var(--accent-blue);">${horizDivsForPeriod.toFixed(1)} div</b>.</li>
-                <li>Base de temps : <b style="color: var(--accent-blue);">${timeBase * 1000} ms/div</b>.</li>
-                <li><b>Calcul :</b> T = ${horizDivsForPeriod.toFixed(1)} × ${timeBase * 1000} = <strong style="color: #22c55e;">${exerciseValues.period.toFixed(1)} ms</strong>.</li>
+                <li>Nombre de divisions horizontales pour un motif : <b>${horizDivsForPeriod.toFixed(1)} div</b>.</li>
+                <li>Base de temps : <b>${timeBase * 1000} ms/div</b>.</li>
+                <li><b>Calcul :</b> T = ${horizDivsForPeriod.toFixed(1)} × ${timeBase * 1000} = <strong>${exerciseValues.period.toFixed(1)} ms</strong>.</li>
             </ul>
             <p><strong>2. Fréquence (f) :</strong></p>
             <ul>
                 <li>Formule : <b>f = 1 / T</b> (avec T en secondes).</li>
-                <li><b>Calcul :</b> f = 1 / ${ (exerciseValues.period / 1000).toPrecision(3) } = <strong style="color: #22c55e;">${exerciseValues.frequency.toFixed(1)} Hz</strong>.</li>
+                <li><b>Calcul :</b> f = 1 / ${ (exerciseValues.period / 1000).toPrecision(3) } = <strong>${exerciseValues.frequency.toFixed(1)} Hz</strong>.</li>
             </ul>
             <p><strong>3. Tension Maximale (Umax) :</strong></p>
             <ul>
-                <li>Nombre de divisions verticales (du centre au sommet) : <b style="color: var(--accent-blue);">${vertDivsForUmax.toFixed(1)} div</b>.</li>
-                <li>Sensibilité verticale : <b style="color: var(--accent-blue);">${sensitivity} V/div</b>.</li>
-                <li><b>Calcul :</b> Umax = ${vertDivsForUmax.toFixed(1)} × ${sensitivity} = <strong style="color: #22c55e;">${exerciseValues.voltage.toFixed(1)} V</strong>.</li>
+                <li>Nombre de divisions verticales (du centre au sommet) : <b>${vertDivsForUmax.toFixed(1)} div</b>.</li>
+                <li>Sensibilité verticale : <b>${sensitivity} V/div</b>.</li>
+                <li><b>Calcul :</b> Umax = ${vertDivsForUmax.toFixed(1)} × ${sensitivity} = <strong>${exerciseValues.voltage.toFixed(1)} V</strong>.</li>
             </ul>
         `;
         correctionDetailsDiv.style.display = 'block';
@@ -352,4 +271,4 @@
 </script>
 
 </body>
-</html>```
+</html>
