@@ -50,6 +50,12 @@
       "description": "Apréhender la loi d'Ohm en manipulant la tension et la résistance.",
       "lien": "electronique/URI.html"
     },
+	{
+	  "categorie": "electronique",
+      "titre": "Simulateur Pédagogique de Liaison Série (RS232/UART)",
+      "description": "Une application web interactive pour maîtriser la communication série.",
+      "lien": "electronique/rs232-serial-simulator.html"
+	},
     {
       "categorie": "electronique",
       "titre": "Calculateur de Loi d'Ohm",
